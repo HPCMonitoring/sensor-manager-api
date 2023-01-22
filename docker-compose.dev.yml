@@ -15,14 +15,6 @@ services:
       - sensor_manager_db:/var/lib/postgresql/data
     restart: always
 
-  sensor-manager-api:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    image: sensor-manager-api/server:latest
-    ports:
-      - 8080:8080
-      
 volumes:
   sensor_manager_db:
 
