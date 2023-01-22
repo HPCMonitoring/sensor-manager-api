@@ -1,6 +1,7 @@
 {
   "name": "sensor-manager-api",
   "version": "1.0.0",
+  "license": "ISC",
   "description": "",
   "scripts": {
     "build": "tsc && babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
@@ -16,7 +17,7 @@
     "prisma:generate": "npx prisma generate",
     "test:lint": "eslint '**/*.{ts,js}'",
     "test:lint:fix": "eslint '**/*.{ts,js}' --fix",
-    "prettier": "prettier '**/*.{ts,js,json,md,yml,yaml}' --write",
+    "format": "prettier '**/*.{ts,js,json,md}' --write",
     "prepare": "is-ci || husky install"
   },
   "dependencies": {
