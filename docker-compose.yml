@@ -18,6 +18,8 @@ services:
       context: .
       dockerfile: ./Dockerfile
     image: sensor-manager-api:0.1.0
+    networks:
+      - sensor_manager_network
     ports:
       - 8080:8080
       

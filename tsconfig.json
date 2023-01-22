@@ -22,7 +22,10 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "lib": ["es7", "dom", "ESNext.AsyncIterable"],
-        "typeRoots": ["./node_modules/@types"]
+        "typeRoots": ["./node_modules/@types"],
+        "paths": {
+            "@controllers": ["src/controllers"]
+        }
     },
     "include": ["src", "**/*.js", "**/*.ts"],
     "linterOptions": {

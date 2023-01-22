@@ -1,4 +1,3 @@
-import { join } from "path";
 import { Configuration, Inject } from "@tsed/di";
 import { PlatformApplication } from "@tsed/common";
 import "@tsed/platform-express"; // /!\ keep this import
@@ -9,9 +8,8 @@ import methodOverride from "method-override";
 import cors from "cors";
 import "@tsed/ajv";
 import "@tsed/swagger";
-import { config } from "./config/index";
-import * as rest from "./controllers/rest/index";
-import * as pages from "./controllers/pages/index";
+import { config } from "./config";
+import * as rest from "./controllers";
 
 @Configuration({
     ...config,
@@ -20,8 +18,7 @@ import * as pages from "./controllers/pages/index";
     httpsPort: false, // CHANGE
     componentsScan: false,
     mount: {
-        "/rest": [...Object.values(rest)],
-        "/": [...Object.values(pages)]
+        "/api": [...Object.values(rest)]
     },
     swagger: [
         {
@@ -39,12 +36,6 @@ import * as pages from "./controllers/pages/index";
             extended: true
         })
     ],
-    views: {
-        root: join(process.cwd(), "../views"),
-        extensions: {
-            ejs: "ejs"
-        }
-    },
     exclude: ["**/*.spec.ts"]
 })
 export class Server {

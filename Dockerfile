@@ -31,4 +31,4 @@ COPY --from=development /usr/src/app/dist .
 ENV NODE_ENV=production
 
 EXPOSE 8080
-CMD yarn prisma:push && node index.js
+CMD yarn prisma:migrate && node index.js
