@@ -6,3 +6,5 @@ node_modules
 *.yaml
 *.yml
 *.json
+*.md
+coverage

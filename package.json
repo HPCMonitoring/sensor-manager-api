@@ -18,7 +18,7 @@
     "prisma:studio": "npx prisma studio",
     "test:lint": "eslint '**/*.{ts,js}'",
     "test:lint:fix": "eslint '**/*.{ts,js}' --fix",
-    "format": "prettier '**/*.{ts,js,json,md}' --write",
+    "format": "prettier '**/*.{ts,js,json}' --write",
     "prepare": "is-ci || husky install",
     "bootstrap": "yarn start:docker && yarn && yarn prisma:migrate",
     "start:docker": "docker-compose -f docker-compose.dev.yml up -d",
