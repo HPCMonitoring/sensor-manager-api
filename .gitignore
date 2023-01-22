@@ -52,6 +52,7 @@ test/**/*.js.map
 /public
 /dist
 
-#env
-.env.local
-.env.development
+# env
+.env*
+!.env.example
+

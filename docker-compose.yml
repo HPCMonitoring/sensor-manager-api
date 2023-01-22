@@ -7,8 +7,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - 5432:5432
     networks:
       - sensor_manager_network
     volumes:
@@ -19,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    image: sensor-manager-api/server:latest
+    image: sensor-manager-api:0.1.0
     ports:
       - 8080:8080
       

@@ -1710,7 +1710,7 @@
     normalize-path "3.0.0"
     tslib "2.4.0"
 
-"@tsed/openspec@7.13.0":
+"@tsed/openspec@7.13.0", "@tsed/openspec@^7.13.0":
   version "7.13.0"
   resolved "https://registry.yarnpkg.com/@tsed/openspec/-/openspec-7.13.0.tgz#17287f0212432a847ea5214ad7bc7b6a506b0565"
   integrity sha512-YpyBwDXSt7o/Nh4rDFGM04JLHZtgqmEBOaBGHXx0SIBub+li2rhJlA3at+lnvdAhaj4kpQiudQ6kdOshs8h1nQ==
@@ -2400,7 +2400,7 @@ aggregate-error@^3.0.0:
     clean-stack "^2.0.0"
     indent-string "^4.0.0"
 
-ajv-errors@3.0.0:
+ajv-errors@3.0.0, ajv-errors@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/ajv-errors/-/ajv-errors-3.0.0.tgz#e54f299f3a3d30fe144161e5f0d8d51196c527bc"
   integrity sha512-V3wD15YHfHz6y0KdhYFjyy9vWtEVALT9UrxfN3zqlI6dMioHnJrqOYfyPKol3oqrnCM9uwkcdCwkJ0WUcbLMTQ==

@@ -4,7 +4,7 @@ ARG NODE_VERSION=18.13.0
 FROM node:${NODE_VERSION}-alpine as development
 WORKDIR /usr/src/app
 
-COPY package.json yarn.lock tsconfig.json tsconfig.compile.json .barrelsby.json jest.config.js ./
+COPY package.json yarn.lock tsconfig.json tsconfig.compile.json .babelrc jest.config.js webpack.config.js ./
 COPY ./src ./src
 COPY ./prisma ./prisma
 
