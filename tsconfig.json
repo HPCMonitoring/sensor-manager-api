@@ -2,7 +2,7 @@
     "compilerOptions": {
         "baseUrl": ".",
         "sourceRoot": "src",
-        "module": "commonjs",
+        "module": "ESNext",
         "target": "esnext",
         "sourceMap": true,
         "declaration": false,
@@ -21,10 +21,11 @@
         "noEmit": true,
         "esModuleInterop": true,
         "resolveJsonModule": true,
-        "lib": ["es7", "dom", "ESNext.AsyncIterable"],
+        "lib": ["ESNext", "dom", "ESNext.AsyncIterable"],
         "typeRoots": ["./node_modules/@types"],
         "paths": {
-            "@controllers": ["src/controllers"]
+            "@controllers": ["src/controllers"],
+            "@constants": ["src/constants"]
         }
     },
     "include": ["src", "**/*.js", "**/*.ts"],
