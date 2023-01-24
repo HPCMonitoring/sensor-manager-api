@@ -11,7 +11,7 @@
     "test": "yarn run test:lint && yarn run test:coverage",
     "test:unit": "cross-env NODE_ENV=test jest",
     "test:coverage": "yarn run test:unit",
-    "prisma:migrate": "npx prisma migrate dev --name init",
+    "prisma:migrate": "npx prisma migrate dev",
     "prisma:generate": "npx prisma generate",
     "prisma:studio": "npx prisma studio",
     "test:lint": "eslint '**/*.{ts,js}'",
@@ -63,9 +63,14 @@
     "multer": "^1.4.5-lts.1",
     "passport": "^0.6.0",
     "prisma": "^4.9.0",
-    "socket.io": "^4.5.4"
+    "socket.io": "^4.5.4",
+    "ts-node": "^10.9.1"
   },
   "devDependencies": {
+    "@tsed/cli-plugin-eslint": "4.2.2",
+    "@tsed/cli-plugin-jest": "4.2.2",
+    "@tsed/cli-plugin-passport": "4.2.2",
+    "@tsed/cli-plugin-prisma": "4.2.2",
     "@tsed/socketio-testing": "7.13.0",
     "@types/compression": "^1.7.2",
     "@types/cookie-parser": "^1.4.3",
