@@ -9,3 +9,5 @@ export const config: Partial<TsED.Configuration> = {
     logger: loggerConfig
     // additional shared configuration
 };
+
+export * from "./ExceptionFilter";
