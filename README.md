@@ -23,6 +23,12 @@ Run one command to set up for development:
 yarn bootstrap
 ```
 
+Start project:
+
+```bash
+yarn start
+```
+
 ## Helpful resources
 
 ### Prisma
