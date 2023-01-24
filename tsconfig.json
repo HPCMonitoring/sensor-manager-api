@@ -2,8 +2,10 @@
     "compilerOptions": {
         "baseUrl": ".",
         "sourceRoot": "src",
-        "module": "ESNext",
-        "target": "esnext",
+        "outDir": "dist",
+        "module": "CommonJS",
+        "target": "ES6",
+        "allowJs": false,
         "sourceMap": true,
         "declaration": false,
         "experimentalDecorators": true,
@@ -13,22 +15,23 @@
         "suppressImplicitAnyIndexErrors": false,
         "noImplicitAny": true,
         "strictNullChecks": true,
-        "noUnusedLocals": false,
-        "noUnusedParameters": false,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
         "allowSyntheticDefaultImports": true,
         "importHelpers": true,
         "newLine": "LF",
-        "noEmit": true,
+        "noEmit": false,
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "lib": ["ESNext", "dom", "ESNext.AsyncIterable"],
         "typeRoots": ["./node_modules/@types"],
         "paths": {
-            "@controllers": ["src/controllers"],
-            "@constants": ["src/constants"]
+            "@controllers": ["./src/controllers"],
+            "@constants": ["./src/constants"]
         }
     },
     "include": ["src", "**/*.js", "**/*.ts"],
+    "exclude": ["node_modules", "dist"],
     "linterOptions": {
         "exclude": []
     }
