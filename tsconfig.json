@@ -4,8 +4,8 @@
         "sourceRoot": "src",
         "outDir": "dist",
         "module": "CommonJS",
-        "target": "ES6",
-        "allowJs": false,
+        "target": "ESNext",
+        "allowJs": true,
         "sourceMap": true,
         "declaration": false,
         "experimentalDecorators": true,
@@ -20,7 +20,7 @@
         "allowSyntheticDefaultImports": true,
         "importHelpers": true,
         "newLine": "LF",
-        "noEmit": false,
+        "noEmit": true,
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "lib": ["ESNext", "dom", "ESNext.AsyncIterable"],
@@ -31,7 +31,7 @@
         }
     },
     "include": ["src", "**/*.js", "**/*.ts"],
-    "exclude": ["node_modules", "dist"],
+    "exclude": ["node_modules", "dist", "coverage"],
     "linterOptions": {
         "exclude": []
     }

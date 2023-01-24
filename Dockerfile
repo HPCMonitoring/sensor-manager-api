@@ -21,10 +21,10 @@ COPY .env.production ./dist/.env
 FROM node:${NODE_VERSION}-alpine as production
 WORKDIR /usr/src/app
 
-RUN yarn install --prod
-COPY --from=development /usr/src/app/dist .
-
 ENV NODE_ENV=production
+
+COPY --chown=node:node --from=development /usr/src/app/dist .
+RUN yarn install --production=true
 
 EXPOSE 8080
 CMD yarn prisma:migrate && node index.js
