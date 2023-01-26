@@ -1,7 +1,7 @@
-name: CI
+name: Publishing
 
 on:
-  pull_request:
+  push:
     branches: ["master"]
 
 env:
@@ -29,12 +29,17 @@ jobs:
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v2
-      
+
+      - name: Log into registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository }}
+          password: ${{ secrets.HPC_TOKEN }}
+
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: .
-          push: false
-          tags: ${{ env.IMAGE_NAME }}:latest
-      
-      # TODO: ssh to a machine which is chosen to be host server and pull image from cloud to deploy
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
