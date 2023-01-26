@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ["master"]
+
+env:
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  IMAGE_NAME: bkhpc/sensor-manager-api
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - uses: actions/checkout@v3
+        name: Checkout repository
+
+      - name: Set up env file
+        run: |
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env.production
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env.production
+          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env.production
+          echo POSTGRES_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@sensormanagerdb:5432/${{ secrets.POSTGRES_DB }}?schema=public
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:latest
+      
+      # TODO: ssh to a machine which is chosen to be host server and pull image from cloud to deploy
