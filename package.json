@@ -20,7 +20,8 @@
     "prepare": "is-ci || husky install",
     "bootstrap": "yarn start:docker && yarn && yarn prisma:migrate",
     "start:docker": "docker-compose -f docker-compose.dev.yml up -d",
-    "cleanup": "docker-compose -f docker-compose.dev.yml down --volumes --remove-orphans",
+    "clean:docker": "docker-compose -f docker-compose.dev.yml down --volumes --remove-orphans",
+    "clean:git": "git branch --merged >/tmp/merged-branches && nano /tmp/merged-branches && xargs git branch -D </tmp/merged-branches && git fetch --prune --all",
     "refresh": "yarn cleanup && yarn start:docker && yarn && yarn prisma:migrate"
   },
   "dependencies": {

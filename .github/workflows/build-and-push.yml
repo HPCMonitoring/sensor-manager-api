@@ -7,7 +7,7 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  IMAGE_NAME: bkhpc/sensor-manager-api
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-test:
@@ -35,7 +35,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.repository }}
-          password: ${{ secrets.HPC_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v3

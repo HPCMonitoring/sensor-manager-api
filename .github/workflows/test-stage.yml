@@ -7,7 +7,7 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  IMAGE_NAME: bkhpc/sensor-manager-api
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-test:
