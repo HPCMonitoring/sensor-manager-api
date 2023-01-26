@@ -7,7 +7,8 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  IMAGE_NAME: smanager-api
+  IMAGE_NAME: bkhpc/vsmbackend
+  IMAGE_TAG: 0.1.0
 
 jobs:
   build-and-test:
@@ -42,4 +43,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }
