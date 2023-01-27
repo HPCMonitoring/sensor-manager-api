@@ -42,7 +42,7 @@ jobs:
 
       - name: Log into registry ${{ env.REGISTRY }}
         run: |
-          export GHCR_PASS = ${{ secrets.GITHUB_TOKEN }}
+          export GHCR_PASS=${{ secrets.GITHUB_TOKEN }}
           echo $GHCR_PASS | docker login ${{ env.REGISTRY }} -u ${{ github.repository_owner }} --password-stdin
       
       - name: Build
