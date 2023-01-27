@@ -7,8 +7,9 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  IMAGE_NAME: bkhpc/sensor-manager/core
+  IMAGE_NAME: hpcmonitoring/sensor-manager-api
   IMAGE_TAG: 0.1.0
+  ORG_USERNAME: hpcmonitoring
 
 permissions:
   packages: write
@@ -50,10 +51,8 @@ jobs:
 
       - name: Log into registry ${{ env.REGISTRY }}
         run: |
-          echo ${{ github.repository_owner }}
-          echo ${{ github.actor }}
           export GHCR_PASS=${{ secrets.GITHUB_TOKEN }}
-          echo $GHCR_PASS | docker login ${{ env.REGISTRY }} -u ${{ github.repository_owner }} --password-stdin
+          echo $GHCR_PASS | docker login ${{ env.REGISTRY }} -u ${{ env.ORG_USERNAME }} --password-stdin
 
       - name: Build
         run: |
@@ -64,10 +63,7 @@ jobs:
           docker image tag ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           docker image push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
-      - name: Post login into registry ${{ env.REGISTRY }}
+      - name: Cleanup
         run: |
+          rm -f /home/runner/.docker/config.json
           docker logout ghcr.io
-
-      - name: Post build
-        run: |
-          docker image prune -a
