@@ -1,18 +1,22 @@
-import { $log } from "@tsed/common";
-import { PlatformExpress } from "@tsed/platform-express";
-import { Server } from "./Server";
+// Require the framework and instantiate it
 
-async function bootstrap() {
-    try {
-        const platform = await PlatformExpress.bootstrap(Server);
-        await platform.listen();
+// ESM
+import Fastify from "fastify";
+const fastify = Fastify({
+    logger: true
+});
 
-        process.on("SIGINT", () => {
-            platform.stop();
-        });
-    } catch (error) {
-        $log.error({ event: "SERVER_BOOTSTRAP_ERROR", message: error.message, stack: error.stack });
+// Declare a route
+fastify.get("/", function (request, reply) {
+    reply.send({ hello: "world" });
+});
+
+// Run the server!
+fastify.listen({ port: 3000 }, function (err, address) {
+    fastify.log.info(address);
+    if (err) {
+        fastify.log.error(err);
+        process.exit(1);
     }
-}
-
-bootstrap();
+    // Server is now listening on ${address}
+});

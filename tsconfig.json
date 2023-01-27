@@ -26,8 +26,10 @@
         "lib": ["ESNext", "dom", "ESNext.AsyncIterable"],
         "typeRoots": ["./node_modules/@types"],
         "paths": {
-            "@controllers": ["./src/controllers"],
-            "@constants": ["./src/constants"]
+            "@controllers": ["src/controllers"],
+            "@constants": ["src/constants"],
+            "@configs/*": ["src/configs/*"],
+            "@services": ["src/services"]
         }
     },
     "include": ["src", "**/*.js", "**/*.ts"],

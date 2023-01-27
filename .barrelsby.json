@@ -1,7 +1,8 @@
 {
     "directory": [
         "./src/controllers",
-        "./src/constants"
+        "./src/constants",
+        "./src/services"
     ],
     "exclude": ["__mock__", "__mocks__", ".spec.ts"],
     "delete": true
