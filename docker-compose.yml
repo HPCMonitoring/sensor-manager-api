@@ -17,7 +17,10 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    image: sensor-manager-api:0.1.0
+    image: ghcr.io/hpcmonitoring/sensor-manager-api:0.1.0
+    container_name: hpcmonitoring_sensor-manager-api
+    environment:
+      - POSTGRES_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@sensormanagerdb:5432/${POSTGRES_DB}?schema=public
     networks:
       - sensor_manager_network
     ports:
