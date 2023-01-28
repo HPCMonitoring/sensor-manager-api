@@ -1,22 +1,16 @@
-// Require the framework and instantiate it
+import fastify from "fastify";
+import { ENVIRONMENT, loggerConfig } from "@configs";
+import { routes } from "./routes";
 
-// ESM
-import Fastify from "fastify";
-const fastify = Fastify({
-    logger: true
-});
+const PORT = 8080;
 
-// Declare a route
-fastify.get("/", function (request, reply) {
-    reply.send({ hello: "world" });
-});
+const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
 
-// Run the server!
-fastify.listen({ port: 3000 }, function (err, address) {
-    fastify.log.info(address);
+app.register(routes, { prefix: "/api" });
+
+app.listen({ port: PORT }, function (err) {
     if (err) {
-        fastify.log.error(err);
+        app.log.error(err);
         process.exit(1);
     }
-    // Server is now listening on ${address}
 });
