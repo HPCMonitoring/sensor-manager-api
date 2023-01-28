@@ -1,3 +1,4 @@
 import createError from "@fastify/error";
+import { errorCodes } from "fastify";
 
-export const BadRequest = createError("FST_ERR_REQ_INVALID_VALIDATION_INVOCATION", "%s");
+export const BadRequest = createError(errorCodes.FST_ERR_SCH_VALIDATION_BUILD().code, "%s", 400);
