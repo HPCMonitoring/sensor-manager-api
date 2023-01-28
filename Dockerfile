@@ -11,10 +11,14 @@ COPY ./prisma ./prisma
 ## for yarn prisma:generate (prisma/schema.prisma only can read environment from .env file)
 COPY .env.production .env 
 
-RUN yarn install && yarn prisma:generate && yarn test:unit && yarn build
+RUN yarn install --prod && yarn prisma:generate
+RUN yarn add -D jest @types/jest ts-jest
+RUN yarn test
+
+RUN yarn build
 
 COPY ./prisma ./dist/prisma
-COPY package.json yarn.lock ./dist/
+COPY package.json ./dist/
 COPY .env.production ./dist/.env
 
 ################## Stage 2 ##################
@@ -24,7 +28,7 @@ WORKDIR /usr/src/app
 ENV NODE_ENV=production
 
 COPY --chown=node:node --from=development /usr/src/app/dist .
-RUN yarn install --production=true
+COPY --chown=node:node --from=development /usr/src/app/node_modules node_modules
 
 EXPOSE 8080
 CMD yarn prisma:migrate && node index.js

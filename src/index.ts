@@ -1,18 +1,16 @@
-import { $log } from "@tsed/common";
-import { PlatformExpress } from "@tsed/platform-express";
-import { Server } from "./Server";
+import fastify from "fastify";
+import { ENVIRONMENT, loggerConfig } from "@configs";
+import { routes } from "./routes";
 
-async function bootstrap() {
-    try {
-        const platform = await PlatformExpress.bootstrap(Server);
-        await platform.listen();
+const PORT = 8080;
 
-        process.on("SIGINT", () => {
-            platform.stop();
-        });
-    } catch (error) {
-        $log.error({ event: "SERVER_BOOTSTRAP_ERROR", message: error.message, stack: error.stack });
+const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
+
+app.register(routes, { prefix: "/api" });
+
+app.listen({ port: PORT }, function (err) {
+    if (err) {
+        app.log.error(err);
+        process.exit(1);
     }
-}
-
-bootstrap();
+});

@@ -1,7 +1,12 @@
 {
     "directory": [
         "./src/controllers",
-        "./src/constants"
+        "./src/constants",
+        "./src/services",
+        "./src/schemas/in",
+        "./src/schemas/out",
+        "./src/configs",
+        "./src/types"
     ],
     "exclude": ["__mock__", "__mocks__", ".spec.ts"],
     "delete": true
