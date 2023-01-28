@@ -1,3 +1,3 @@
-export enum SwaggerTag {
+export enum SwaggerControllerTag {
     HELLO = "Hello"
 }

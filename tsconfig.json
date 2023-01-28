@@ -27,12 +27,22 @@
         "typeRoots": ["./node_modules/@types"],
         "paths": {
             "@controllers": ["./src/controllers"],
+            "@controllers/*": ["./src/controllers/*"],
             "@constants": ["src/constants"],
+            "@constants/*": ["src/constants/*"],
             "@services": ["src/services"],
+            "@services/*": ["src/services/*"],
             "@schemas/in": ["src/schemas/in"],
+            "@schemas/in/*": ["src/schemas/in/*"],
             "@schemas/out": ["src/schemas/out"],
+            "@schemas/out/*": ["src/schemas/out/*"],
             "@configs": ["src/configs"],
-            "@types": ["src/types"]
+            "@configs/*": ["src/configs/*"],
+            "@types": ["src/types"],
+            "@types/*": ["src/types/*"],
+            "@repositories": ["src/prisma"],
+            "@utils": ["src/utils"],
+            "@exceptions": ["src/exceptions"]
         }
     },
     "include": ["src", "**/*.js", "**/*.ts"],

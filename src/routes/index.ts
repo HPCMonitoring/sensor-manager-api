@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { helloRoute } from "./hello.route";
+import { userRoute } from "./user.route";
 
 export async function routes(app: FastifyInstance) {
-    app.register(helloRoute, { prefix: "/hello" });
+    app.register(userRoute, { prefix: "/users" });
 }

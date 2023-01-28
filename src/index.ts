@@ -7,8 +7,12 @@ const PORT = 8080;
 
 const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
 
-app.register(import("@fastify/swagger"), swaggerConfig);
-app.register(import("@fastify/swagger-ui"), swaggerUIConfig);
+// Swagger on production will be turned off in the future
+if (ENVIRONMENT === "development" || ENVIRONMENT === "staging" || ENVIRONMENT === "production") {
+    app.register(import("@fastify/swagger"), swaggerConfig);
+    app.register(import("@fastify/swagger-ui"), swaggerUIConfig);
+}
+
 app.register(routes, { prefix: "/api" });
 
 app.ready().then(() => app.swagger({ yaml: true }));
