@@ -5,7 +5,6 @@
         "outDir": "dist",
         "sourceRoot": "src",
         "moduleResolution": "node",
-        "declaration": true,
         "noResolve": false,
         "preserveConstEnums": true,
         "sourceMap": true,

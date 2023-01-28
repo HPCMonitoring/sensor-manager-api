@@ -3,3 +3,4 @@
  */
 
 export * from "./errorMessages";
+export * from "./swagger";
