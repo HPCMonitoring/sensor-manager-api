@@ -71,10 +71,14 @@ To maintain only one style coding across members, we use [`prettier`](https://pr
 yarn format
 ```
 
-Notice that:
+You don't need to run these scripts regularly or before commiting code. They are run automatically before `git commit` command by setting as a precommit script. In some circumstances, precommit script is not enabled by default, just type two commands below to fix it:
 
-- You don't need to run these scripts regularly or before commiting code. They are run automatically before `git commit` command by setting as a precommit script.
-- Two plugins above could be installed in `VSCode` as extensions.
+```bash
+chmod ug+x .husky/*
+chmod ug+x .git/hooks/*
+```
+
+For a tip, two plugins above could be installed in `VSCode` as extensions.
 
 ### Barrelsby & Path alias
 

@@ -17,12 +17,10 @@ jobs:
       - uses: actions/checkout@v3
         name: Checkout repository
 
+      # Will add envs later (if necessary) 
       - name: Set up env file
         run: |
-          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env.production
-          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env.production
-          echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env.production
-          echo POSTGRES_URL=postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@sensormanagerdb:5432/${{ secrets.POSTGRES_DB }}?schema=public
+          echo > .env.production
       
       - name: Build and push
         uses: docker/build-push-action@v3
