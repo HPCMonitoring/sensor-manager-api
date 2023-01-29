@@ -100,13 +100,15 @@ import { ASchema } from '../schemas/in/ids.schema.ts'
 
 The more nested folders, the more bad looking importation. It is waste time to guess how many `..` should be put in relative path.
 
-The solution is [`barrelsby`](https://www.npmjs.com/package/barrelsby). With configurations in `.barrelsby.json`, barrelsby can import your entire code base in a specific folder, and re-export them in `index.ts` file.
+The solution is [`barrelsby`](https://www.npmjs.com/package/barrelsby) and **path alias**. With configurations in `.barrelsby.json`, barrelsby can import your entire code base in a specific folder, and re-export them in `index.ts` file.
 
 Try this:
 
 ```bash
 yarn barrels
 ```
+
+To avoid using many `..` in relative path, config path alias in `tsconfig.json`. See the guideline [here](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping).
 
 ## Git working culture
 
