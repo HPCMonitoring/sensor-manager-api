@@ -61,13 +61,13 @@ jobs:
           script: |
             export CR_PAT=${{ secrets.GITHUB_TOKEN }}
             echo $CR_PAT | docker login ${{ env.REGISTRY }} -u ${{ env.ORG_USERNAME }} --password-stdin
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
             cd $HOME/HPCMonitoring/sensor-manager-api
             rm -f .env
             echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
             curl https://raw.githubusercontent.com/HPCMonitoring/sensor-manager-api/master/docker-compose.yml -o docker-compose.yml
+            docker-compose pull
             if [[ "${{ vars.CLEAR_VOLUME }}" == "true" ]];
             then
               echo "Drop old database !"

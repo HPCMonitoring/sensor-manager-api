@@ -25,6 +25,8 @@ services:
       - sensor_manager_network
     ports:
       - 8080:8080
+    depends_on:
+      - postgres
       
 volumes:
   sensor_manager_db:
