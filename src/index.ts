@@ -4,6 +4,7 @@ import { ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@conf
 import { routes } from "./routes";
 
 const PORT = 8080;
+const HOST = "0.0.0.0"; // DO NOT modify, it is used to resolve port mapping when deploy.
 
 const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
 
@@ -17,7 +18,7 @@ app.register(routes, { prefix: "/api" });
 
 app.ready().then(() => app.swagger({ yaml: true }));
 
-app.listen({ port: PORT }, function (err) {
+app.listen({ host: HOST, port: PORT }, function (err) {
     if (err) {
         app.log.error(err);
         process.exit(1);
