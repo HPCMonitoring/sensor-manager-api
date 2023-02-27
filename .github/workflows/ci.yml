@@ -26,7 +26,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          push: false
+          push: true
           tags: ${{ env.IMAGE_NAME }}:latest
-      
-      # TODO: ssh to a machine which is chosen to be host server and pull image from cloud to deploy

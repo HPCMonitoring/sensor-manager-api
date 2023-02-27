@@ -1,3 +1,4 @@
 export enum SwaggerControllerTag {
-    HELLO = "Hello"
+    HELLO = "Hello",
+    AUTH = "Auth"
 }
