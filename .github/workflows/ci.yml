@@ -7,7 +7,12 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  IMAGE_NAME: bkhpc/sensor-manager/core
+  # Image name MUST have a pattern like <org_name_lowercase>/<repo_name_lowercase>
+  IMAGE_NAME: hpcmonitoring/sensor-manager-api
+  IMAGE_TAG: 0.1.0
+
+permissions:
+  packages: write
 
 jobs:
   build-and-test:
@@ -17,14 +22,17 @@ jobs:
       - uses: actions/checkout@v3
         name: Checkout repository
 
-      # Will add envs later (if necessary) 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        
+      # Will add envs later (if necessary)
       - name: Set up env file
         run: |
           echo > .env.production
-      
+
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: .
           push: true
-          tags: ${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
