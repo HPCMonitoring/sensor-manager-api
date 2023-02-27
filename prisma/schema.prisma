@@ -12,8 +12,76 @@ datasource db {
 }
 
 model User {
-  id    String  @id @default(cuid())
-  email String  @unique @db.VarChar(50)
-  name  String?
+  id             String           @id @default(cuid())
+  email          String           @unique @db.VarChar(50)
+  name           String
+  clusters       Cluster[]
+  FilterTemplate FilterTemplate[]
+  KafkaBroker    KafkaBroker[]
 }
 
+model Cluster {
+  id      String   @id @default(cuid())
+  name    String
+  remarks String?
+  sensors Sensor[]
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String
+
+  @@unique([userId, name])
+}
+
+model Sensor {
+  id           String         @id @default(cuid())
+  name         String
+  remarks      String?
+  cluster      Cluster        @relation(fields: [clusterId], references: [id])
+  clusterId    String
+  SensorConfig SensorConfig[]
+
+  @@unique([clusterId, name])
+}
+
+model KafkaBroker {
+  id         String       @id @default(cuid())
+  url        String       @unique
+  name       String
+  user       User         @relation(fields: [userId], references: [id])
+  userId     String
+  KafkaTopic KafkaTopic[]
+
+  @@unique([userId, name])
+}
+
+model KafkaTopic {
+  id           String         @id @default(cuid())
+  name         String
+  broker       KafkaBroker    @relation(fields: [brokerId], references: [id])
+  brokerId     String
+  SensorConfig SensorConfig[]
+
+  @@unique([brokerId, name])
+}
+
+model SensorConfig {
+  id               String          @id @default(cuid())
+  sensor           Sensor          @relation(fields: [sensorId], references: [id])
+  kafkaTopic       KafkaTopic      @relation(fields: [kafkaTopicId], references: [id])
+  interval         Int
+  sql              String
+  sensorId         String
+  kafkaTopicId     String
+  FilterTemplate   FilterTemplate? @relation(fields: [filterTemplateId], references: [id])
+  filterTemplateId String?
+
+  @@unique([sensorId, kafkaTopicId])
+}
+
+model FilterTemplate {
+  id                   String         @id @default(cuid())
+  sql                  String
+  interval             Int
+  user                 User           @relation(fields: [userId], references: [id])
+  userId               String
+  usingBySensorConfigs SensorConfig[]
+}

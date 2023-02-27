@@ -1,10 +1,10 @@
 import fastify from "fastify";
 import { ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 
-import { routes } from "./routes";
+import { apiRoutes, authRoutes } from "./routes";
 
 const PORT = 8080;
-const HOST = "0.0.0.0"; // DO NOT modify, it is used to resolve port mapping when deploy.
+const HOST = ENVIRONMENT === "development" ? "localhost" : "0.0.0.0"; // DO NOT modify, it is used to resolve port mapping when deploy.
 
 const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
 
@@ -14,7 +14,8 @@ if (ENVIRONMENT === "development" || ENVIRONMENT === "staging" || ENVIRONMENT ==
     app.register(import("@fastify/swagger-ui"), swaggerUIConfig);
 }
 
-app.register(routes, { prefix: "/api" });
+app.register(apiRoutes, { prefix: "/api" });
+app.register(authRoutes, { prefix: "/auth" });
 
 app.ready().then(() => app.swagger({ yaml: true }));
 
