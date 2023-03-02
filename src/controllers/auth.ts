@@ -1,6 +1,6 @@
 import { FastifyRequest } from "fastify";
 
-async function getUserById(
+async function login(
     request: FastifyRequest<{
         Body: {
             username: string;
@@ -9,9 +9,12 @@ async function getUserById(
     }>
 ) {
     request.log.info(request.body);
-    return { userId: "1915940", username: "phucvinh" };
+    return {
+        userId: "1915940",
+        username: "phucvinh"
+    };
 }
 
-export const usersController = {
-    getUserById
+export const authCtrler = {
+    login
 };

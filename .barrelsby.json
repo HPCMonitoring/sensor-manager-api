@@ -6,7 +6,9 @@
         "./src/schemas/in",
         "./src/schemas/out",
         "./src/configs",
-        "./src/types"
+        "./src/types",
+        "./src/routes",
+        "./src/middlewares"
     ],
     "exclude": ["__mock__", "__mocks__", ".spec.ts"],
     "delete": true

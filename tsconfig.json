@@ -42,7 +42,11 @@
             "@types/*": ["src/types/*"],
             "@repositories": ["src/prisma"],
             "@utils": ["src/utils"],
-            "@exceptions": ["src/exceptions"]
+            "@exceptions": ["src/exceptions"],
+            "@routes": ["src/routes"],
+            "@routes/*": ["src/routes/*"],
+            "@middlewares": ["src/middlewares"],
+            "@middlewares/*": ["src/middlewares/*"],
         }
     },
     "include": ["src", "**/*.js", "**/*.ts"],

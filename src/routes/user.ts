@@ -1,11 +1,13 @@
 import { SwaggerControllerTag } from "@constants";
-import { usersController } from "@controllers";
+import { usersCrtler } from "@controllers";
+import { verifyToken } from "@middlewares/auth";
 import { userIdSchema } from "@schemas/in";
 import { userSchema } from "@schemas/out";
 import { swaggerTagRoutes } from "@utils";
 import { FastifyInstance, RouteOptions } from "fastify";
 
 export async function userRoute(app: FastifyInstance) {
+    app.addHook("onRequest", verifyToken);
     const routesOptions: RouteOptions[] = [
         {
             method: "GET",
@@ -16,7 +18,7 @@ export async function userRoute(app: FastifyInstance) {
                     200: userSchema
                 }
             },
-            handler: usersController.getUserById
+            handler: usersCrtler.getUserById
         }
     ];
 

@@ -9,6 +9,6 @@ async function getUserById(
     return userService.getById(request.params.userId);
 }
 
-export const usersController = {
+export const usersCrtler = {
     getUserById
 };
