@@ -21,7 +21,7 @@ async function userPlugin(app: FastifyInstance) {
     ];
 
     // Tag route to a controllerName
-    const swaggerTags = [SwaggerControllerTag.HELLO];
+    const swaggerTags = [SwaggerControllerTag.USER];
     swaggerTagRoutes(app, routesOptions, swaggerTags);
 }
 

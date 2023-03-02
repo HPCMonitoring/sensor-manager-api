@@ -1,9 +1,10 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { compare } from "bcrypt";
+import { compare, hash } from "bcrypt";
 import { prisma } from "@repositories";
-import { LOGIN_FAIL, USER_NOT_FOUND } from "@constants";
+import { DUPLICATED_EMAIL, LOGIN_FAIL, SALT_ROUNDS, USER_NOT_FOUND } from "@constants";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@configs";
+import { User } from "@prisma/client";
 
 async function login(
     request: FastifyRequest<{
@@ -36,6 +37,37 @@ async function login(
     };
 }
 
+async function signup(
+    request: FastifyRequest<{
+        Body: {
+            email: string;
+            password: string;
+        };
+    }>,
+    reply: FastifyReply
+) {
+    const hashPassword = await hash(request.body.password, SALT_ROUNDS);
+    let user: User;
+    try {
+        user = await prisma.user.create({
+            data: {
+                email: request.body.email,
+                password: hashPassword
+            }
+        });
+    } catch (err) {
+        return reply.badRequest(DUPLICATED_EMAIL);
+    }
+
+    const userToken = jwt.sign({ userId: user.id }, JWT_SECRET);
+    reply.setCookie("userId", userToken);
+    return {
+        id: user.id,
+        email: user.email
+    };
+}
+
 export const authCtrler = {
-    login
+    login,
+    signup
 };
