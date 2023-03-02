@@ -7,7 +7,7 @@
         "./src/schemas/out",
         "./src/configs",
         "./src/types",
-        "./src/routes",
+        "./src/plugins",
         "./src/middlewares"
     ],
     "exclude": ["__mock__", "__mocks__", ".spec.ts"],

@@ -13,7 +13,7 @@ datasource db {
 
 model User {
   id             String           @id @default(cuid())
-  username       String           @unique @db.VarChar(50)
+  email          String           @unique @db.VarChar(50)
   password       String
   clusters       Cluster[]
   FilterTemplate FilterTemplate[]

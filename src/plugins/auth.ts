@@ -5,7 +5,7 @@ import { loginResultSchema } from "@schemas/out";
 import { swaggerTagRoutes } from "@utils";
 import { FastifyInstance, RouteOptions } from "fastify";
 
-export async function authRoute(app: FastifyInstance) {
+export async function authPlugin(app: FastifyInstance) {
     const routesOptions: RouteOptions[] = [
         {
             method: "POST",
