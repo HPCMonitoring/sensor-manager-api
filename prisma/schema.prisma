@@ -14,7 +14,7 @@ datasource db {
 model User {
   id             String           @id @default(cuid())
   email          String           @unique @db.VarChar(50)
-  name           String
+  password       String
   clusters       Cluster[]
   FilterTemplate FilterTemplate[]
   KafkaBroker    KafkaBroker[]
@@ -64,24 +64,21 @@ model KafkaTopic {
 }
 
 model SensorConfig {
-  id               String          @id @default(cuid())
-  sensor           Sensor          @relation(fields: [sensorId], references: [id])
-  kafkaTopic       KafkaTopic      @relation(fields: [kafkaTopicId], references: [id])
-  interval         Int
-  sql              String
-  sensorId         String
-  kafkaTopicId     String
-  FilterTemplate   FilterTemplate? @relation(fields: [filterTemplateId], references: [id])
-  filterTemplateId String?
+  id           String     @id @default(cuid())
+  sensor       Sensor     @relation(fields: [sensorId], references: [id])
+  kafkaTopic   KafkaTopic @relation(fields: [kafkaTopicId], references: [id])
+  interval     Int
+  sql          String
+  sensorId     String
+  kafkaTopicId String
 
   @@unique([sensorId, kafkaTopicId])
 }
 
 model FilterTemplate {
-  id                   String         @id @default(cuid())
-  sql                  String
-  interval             Int
-  user                 User           @relation(fields: [userId], references: [id])
-  userId               String
-  usingBySensorConfigs SensorConfig[]
+  id       String @id @default(cuid())
+  sql      String
+  interval Int
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
 }

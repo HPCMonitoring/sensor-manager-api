@@ -1,11 +1,11 @@
 import { SwaggerControllerTag } from "@constants";
-import { usersController } from "@controllers";
+import { authCtrler } from "@controllers";
 import { loginSchema } from "@schemas/in";
 import { loginResultSchema } from "@schemas/out";
 import { swaggerTagRoutes } from "@utils";
 import { FastifyInstance, RouteOptions } from "fastify";
 
-export async function authRoute(app: FastifyInstance) {
+export async function authPlugin(app: FastifyInstance) {
     const routesOptions: RouteOptions[] = [
         {
             method: "POST",
@@ -16,7 +16,7 @@ export async function authRoute(app: FastifyInstance) {
                     200: loginResultSchema
                 }
             },
-            handler: usersController.getUserById
+            handler: authCtrler.login
         }
     ];
 

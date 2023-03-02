@@ -1,11 +1,11 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "username" VARCHAR(50) NOT NULL,
+    "password" TEXT NOT NULL,
 
-  - Made the column `name` on table `User` required. This step will fail if there are existing NULL values in that column.
-
-*/
--- AlterTable
-ALTER TABLE "User" ALTER COLUMN "name" SET NOT NULL;
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Cluster" (
@@ -53,7 +53,6 @@ CREATE TABLE "SensorConfig" (
     "sql" TEXT NOT NULL,
     "sensorId" TEXT NOT NULL,
     "kafkaTopicId" TEXT NOT NULL,
-    "filterTemplateId" TEXT,
 
     CONSTRAINT "SensorConfig_pkey" PRIMARY KEY ("id")
 );
@@ -67,6 +66,9 @@ CREATE TABLE "FilterTemplate" (
 
     CONSTRAINT "FilterTemplate_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Cluster_userId_name_key" ON "Cluster"("userId", "name");
@@ -103,9 +105,6 @@ ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_sensorId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_kafkaTopicId_fkey" FOREIGN KEY ("kafkaTopicId") REFERENCES "KafkaTopic"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_filterTemplateId_fkey" FOREIGN KEY ("filterTemplateId") REFERENCES "FilterTemplate"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FilterTemplate" ADD CONSTRAINT "FilterTemplate_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

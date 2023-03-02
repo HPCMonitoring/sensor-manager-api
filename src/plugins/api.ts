@@ -1,26 +1,30 @@
 import { SwaggerControllerTag } from "@constants";
-import { usersController } from "@controllers";
-import { userIdSchema } from "@schemas/in";
+import { usersCrtler } from "@controllers";
+import { verifyToken } from "@middlewares/auth";
 import { userSchema } from "@schemas/out";
 import { swaggerTagRoutes } from "@utils";
 import { FastifyInstance, RouteOptions } from "fastify";
 
-export async function userRoute(app: FastifyInstance) {
+async function userPlugin(app: FastifyInstance) {
+    app.addHook("onRequest", verifyToken);
     const routesOptions: RouteOptions[] = [
         {
             method: "GET",
-            url: "/:userId",
+            url: "",
             schema: {
-                params: userIdSchema,
                 response: {
                     200: userSchema
                 }
             },
-            handler: usersController.getUserById
+            handler: usersCrtler.getUserById
         }
     ];
 
     // Tag route to a controllerName
     const swaggerTags = [SwaggerControllerTag.HELLO];
     swaggerTagRoutes(app, routesOptions, swaggerTags);
+}
+
+export async function apiPlugin(app: FastifyInstance) {
+    app.register(userPlugin, { prefix: "/user" });
 }
