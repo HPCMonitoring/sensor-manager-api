@@ -1,12 +1,11 @@
 import { SwaggerControllerTag } from "@constants";
 import { usersCrtler } from "@controllers";
-import { verifyToken } from "@middlewares/auth";
+import { verifyToken } from "@middlewares";
 import { userSchema } from "@schemas/out";
 import { swaggerTagRoutes } from "@utils";
 import { FastifyInstance, RouteOptions } from "fastify";
 
 async function userPlugin(app: FastifyInstance) {
-    app.addHook("onRequest", verifyToken);
     const routesOptions: RouteOptions[] = [
         {
             method: "GET",
@@ -26,5 +25,6 @@ async function userPlugin(app: FastifyInstance) {
 }
 
 export async function apiPlugin(app: FastifyInstance) {
+    app.addHook("preHandler", verifyToken);
     app.register(userPlugin, { prefix: "/user" });
 }

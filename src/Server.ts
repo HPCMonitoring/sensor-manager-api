@@ -12,8 +12,7 @@ export function createServer(config: ServerConfig) {
     app.register(import("@fastify/cors"));
     app.register(import("@fastify/cookie"), {
         secret: COOKIES_SECRET, // for cookies signature
-        hook: "onRequest",
-        parseOptions: {}
+        hook: "onRequest"
     } as FastifyCookieOptions);
 
     // Swagger on production will be turned off in the future
