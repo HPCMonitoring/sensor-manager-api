@@ -31,12 +31,13 @@ model Cluster {
 
 model Sensor {
   id            String         @id @default(cuid())
+  ipAddr        String
   name          String         @db.VarChar(50)
-  kernelName    String?        @db.VarChar(100)
-  kernelVersion String?        @db.VarChar(50)
-  arch          String?        @db.VarChar(25)
-  hostname      String?        @db.VarChar(100)
-  rootUser      String?        @db.VarChar(50)
+  kernelName    String         @db.VarChar(100)
+  kernelVersion String         @db.VarChar(50)
+  arch          String         @db.VarChar(25)
+  hostname      String         @db.VarChar(100)
+  rootUser      String         @db.VarChar(50)
   remarks       String?
   status        SensorStatus   @default(REQUESTED)
   cluster       Cluster        @relation(fields: [clusterId], references: [id], onDelete: Cascade)

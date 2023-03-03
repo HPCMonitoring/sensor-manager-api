@@ -4,4 +4,5 @@
 
 export * from "./auth.ctrler";
 export * from "./cluster.ctrler";
+export * from "./sensor.ctrler";
 export * from "./user.ctrler";

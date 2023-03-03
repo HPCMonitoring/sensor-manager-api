@@ -7,4 +7,4 @@ export const MUST_LOGIN_FIRST = "Login first !";
 export const INVALID_TOKEN = "Invalid token !";
 
 export const DUPLICATED_CLUSTER = "Cluster name already exists !";
-export const CLUSTER_NOT_EXISTS = "Cluster does not exist !";
+export const CLUSTER_NOT_EXISTS = "Cluster not found !";

@@ -1,5 +1,6 @@
 export enum SwaggerControllerTag {
     USER = "User",
     AUTH = "Auth",
-    CLUSTER = "Cluster"
+    CLUSTER = "Cluster",
+    SENSOR = "Sensor"
 }

@@ -1,11 +1,11 @@
+import { idSchema, nullable } from "@schemas/common";
 import s from "fluent-json-schema";
-import { idSchema } from "../common.schema";
 
 export const clusterSchema = s
     .object()
     .prop("id", idSchema)
     .prop("name", s.string())
-    .prop("remarks", s.mixed(["string", "null"]).examples(["Some notes ..."]));
+    .prop("remarks", s.string().raw({ nullable: true }).examples(["Some notes ..."]));
 
 export type Cluster = {
     id: string;
@@ -18,7 +18,7 @@ export const getAllClustersSchema = s.array().items(
         .object()
         .prop("id", idSchema)
         .prop("name", s.string().examples(["BK HPC Laboratory"]))
-        .prop("remarks", s.mixed(["string", "null"]))
+        .prop("remarks", s.string().raw(nullable))
         .prop("numOfSensors", s.number())
         .prop("numOfActiveSensors", s.number())
 );
