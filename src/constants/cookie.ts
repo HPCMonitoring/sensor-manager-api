@@ -1,6 +1,8 @@
+import { ENVIRONMENT } from "@configs";
+
 export const cookieOptions = {
     signed: false,
-    secure: false,
+    secure: ENVIRONMENT === "production",
     path: "/",
-    httpOnly: false
+    httpOnly: true
 };

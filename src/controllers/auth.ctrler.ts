@@ -29,9 +29,7 @@ async function login(
     if (!correctPassword) return reply.badRequest(LOGIN_FAIL);
 
     const userToken = jwt.sign({ userId: user.id }, JWT_SECRET);
-    request.log.info(userToken);
     reply.setCookie("token", userToken, cookieOptions);
-    request.log.info(reply.cookies);
 
     return {
         id: user.id,
