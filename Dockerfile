@@ -31,4 +31,4 @@ COPY --chown=node:node --from=development /usr/src/app/dist .
 COPY --chown=node:node --from=development /usr/src/app/node_modules node_modules
 
 EXPOSE 8080
-CMD yarn prisma:migrate && node index.js
+CMD yarn db:deploy && node index.js
