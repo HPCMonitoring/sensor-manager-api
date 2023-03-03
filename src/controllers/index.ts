@@ -3,4 +3,5 @@
  */
 
 export * from "./auth.ctrler";
+export * from "./cluster.ctrler";
 export * from "./user.ctrler";

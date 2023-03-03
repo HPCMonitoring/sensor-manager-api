@@ -12,32 +12,36 @@ datasource db {
 }
 
 model User {
-  id             String           @id @default(cuid())
-  email          String           @unique @db.VarChar(50)
-  password       String
-  clusters       Cluster[]
-  FilterTemplate FilterTemplate[]
-  KafkaBroker    KafkaBroker[]
+  id       String @id @default(cuid())
+  email    String @unique @db.VarChar(50)
+  password String
+
+  // Currently, not bind resource to a specific user
+  // clusters       Cluster[]
+  // FilterTemplate FilterTemplate[]
+  // KafkaBroker    KafkaBroker[]
 }
 
 model Cluster {
   id      String   @id @default(cuid())
-  name    String
+  name    String   @unique
   remarks String?
   sensors Sensor[]
-  user    User     @relation(fields: [userId], references: [id])
-  userId  String
-
-  @@unique([userId, name])
 }
 
 model Sensor {
-  id           String         @id @default(cuid())
-  name         String
-  remarks      String?
-  cluster      Cluster        @relation(fields: [clusterId], references: [id])
-  clusterId    String
-  SensorConfig SensorConfig[]
+  id            String         @id @default(cuid())
+  name          String         @db.VarChar(50)
+  kernelName    String?        @db.VarChar(100)
+  kernelVersion String?        @db.VarChar(50)
+  arch          String?        @db.VarChar(25)
+  hostname      String?        @db.VarChar(100)
+  rootUser      String?        @db.VarChar(50)
+  remarks       String?
+  status        SensorStatus   @default(REQUESTED)
+  cluster       Cluster        @relation(fields: [clusterId], references: [id], onDelete: Cascade)
+  clusterId     String
+  configs       SensorConfig[]
 
   @@unique([clusterId, name])
 }
@@ -45,28 +49,24 @@ model Sensor {
 model KafkaBroker {
   id         String       @id @default(cuid())
   url        String       @unique
-  name       String
-  user       User         @relation(fields: [userId], references: [id])
-  userId     String
+  name       String       @unique
   KafkaTopic KafkaTopic[]
-
-  @@unique([userId, name])
 }
 
 model KafkaTopic {
-  id           String         @id @default(cuid())
-  name         String
-  broker       KafkaBroker    @relation(fields: [brokerId], references: [id])
-  brokerId     String
-  SensorConfig SensorConfig[]
+  id            String         @id @default(cuid())
+  name          String
+  broker        KafkaBroker    @relation(fields: [brokerId], references: [id])
+  brokerId      String
+  sensorConfigs SensorConfig[]
 
   @@unique([brokerId, name])
 }
 
 model SensorConfig {
   id           String     @id @default(cuid())
-  sensor       Sensor     @relation(fields: [sensorId], references: [id])
-  kafkaTopic   KafkaTopic @relation(fields: [kafkaTopicId], references: [id])
+  sensor       Sensor     @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  kafkaTopic   KafkaTopic @relation(fields: [kafkaTopicId], references: [id], onDelete: Cascade)
   interval     Int
   sql          String
   sensorId     String
@@ -77,8 +77,13 @@ model SensorConfig {
 
 model FilterTemplate {
   id       String @id @default(cuid())
-  sql      String
-  interval Int
-  user     User   @relation(fields: [userId], references: [id])
-  userId   String
+  script   String
+  interval Float
+}
+
+enum SensorStatus {
+  RUNNING // Sensor is connecting to server, and doing it jobs
+  STOPPED // Sensor is connecting to server, and not doing anythings
+  REQUESTED // Sensor registered with server, and waiting to be accepted
+  DISCONNECTED // Sensor lost connection with server
 }

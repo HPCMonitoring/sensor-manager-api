@@ -2,11 +2,11 @@ import { SwaggerControllerTag } from "@constants";
 import { authCtrler } from "@controllers";
 import { authInputSchema } from "@schemas/in";
 import { authResultSchema } from "@schemas/out";
-import { swaggerTagRoutes } from "@utils";
-import { FastifyInstance, RouteOptions } from "fastify";
+import { createPlugin } from "@utils";
 
-export async function authPlugin(app: FastifyInstance) {
-    const routesOptions: RouteOptions[] = [
+export const authPlugin = createPlugin(
+    [SwaggerControllerTag.AUTH],
+    [
         {
             method: "POST",
             url: "/login",
@@ -29,9 +29,5 @@ export async function authPlugin(app: FastifyInstance) {
             },
             handler: authCtrler.signup
         }
-    ];
-
-    // Tag route to a controllerName
-    const swaggerTags = [SwaggerControllerTag.AUTH];
-    swaggerTagRoutes(app, routesOptions, swaggerTags);
-}
+    ]
+);
