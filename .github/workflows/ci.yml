@@ -23,10 +23,12 @@ jobs:
       - uses: actions/checkout@v3
         name: Checkout repository
 
-      # Will add envs later (if necessary) 
       - name: Set up env file
         run: |
           echo > .env.production
+          echo COOKIE_SECRET=${{ secrets.COOKIE_SECRET }} >> .env.production
+          echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env.production
+          echo CORS_WHITE_LIST=${{ vars.CORS_WHITE_LIST }} >> .env.production
 
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v2

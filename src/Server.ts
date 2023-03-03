@@ -1,6 +1,6 @@
 import fastify from "fastify";
 import type { FastifyCookieOptions } from "@fastify/cookie";
-import { COOKIES_SECRET, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
+import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 import { authPlugin, apiPlugin } from "@plugins";
 import { ServerConfig } from "@types";
 
@@ -9,9 +9,12 @@ export function createServer(config: ServerConfig) {
 
     app.register(import("@fastify/sensible"));
     app.register(import("@fastify/helmet"));
-    app.register(import("@fastify/cors"));
+    app.register(import("@fastify/cors"), {
+        origin: CORS_WHITE_LIST
+    });
+
     app.register(import("@fastify/cookie"), {
-        secret: COOKIES_SECRET, // for cookies signature
+        secret: COOKIE_SECRET, // for cookies signature
         hook: "onRequest"
     } as FastifyCookieOptions);
 
