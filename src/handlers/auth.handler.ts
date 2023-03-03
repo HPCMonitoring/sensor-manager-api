@@ -55,7 +55,7 @@ async function signup(request: FastifyRequest<{ Body: AuthInput }>, reply: Fasti
     };
 }
 
-export const authCtrler = {
+export const authHandler = {
     login,
     signup
 };

@@ -1,4 +1,4 @@
-export enum SwaggerControllerTag {
+export enum HandlerTag {
     USER = "User",
     AUTH = "Auth",
     CLUSTER = "Cluster",

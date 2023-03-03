@@ -77,7 +77,7 @@ async function deleteCluster(
     }
 }
 
-export const clusterCtrler = {
+export const clustersHandler = {
     getAll,
     create,
     update,

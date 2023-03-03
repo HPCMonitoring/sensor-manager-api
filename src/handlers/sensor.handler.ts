@@ -18,6 +18,6 @@ async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId
     });
 }
 
-export const sensorCtrler = {
+export const sensorHandler = {
     getByClusterId
 };

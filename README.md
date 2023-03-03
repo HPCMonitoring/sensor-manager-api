@@ -35,12 +35,11 @@ yarn start
 📦src
  ┣ 📂configs        # Contain environment variables & app configurations
  ┣ 📂constants      # Constants and enums go here
- ┣ 📂controllers    # Controllers, which are responsible for handling incoming requests
+ ┣ 📂handlers       # Handlers, which are responsible for handling core business logic
  ┣ 📂plugins        # Plugin, in charge of organizing api path & registering middleware
  ┣ 📂schemas        # Schema for input (from requests) & output (from responses)
  ┃ ┣ 📂in
  ┃ ┗ 📂out
- ┣ 📂services       # Core business logics should be implemented here
  ┣ 📂types          # Types
  ┣ 📜prisma.ts      # Prisma instance (for connect & query database)
  ┣ 📜utils.ts       # Helping classes and functions

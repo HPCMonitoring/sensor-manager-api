@@ -1,12 +1,12 @@
-import { SwaggerControllerTag } from "@constants";
-import { sensorCtrler } from "@controllers";
+import { HandlerTag } from "@constants";
+import { sensorHandler } from "@handlers";
 import { idSchema } from "@schemas/common";
 import { getAllSensorsSchema } from "@schemas/out";
 import { createPlugin } from "@utils";
 import s from "fluent-json-schema";
 
 export const sensorPlugin = createPlugin(
-    [SwaggerControllerTag.SENSOR],
+    [HandlerTag.SENSOR],
     [
         {
             method: "GET",
@@ -17,7 +17,7 @@ export const sensorPlugin = createPlugin(
                     200: getAllSensorsSchema
                 }
             },
-            handler: sensorCtrler.getByClusterId
+            handler: sensorHandler.getByClusterId
         }
     ]
 );

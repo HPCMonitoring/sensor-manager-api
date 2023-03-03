@@ -17,6 +17,6 @@ async function getUserById(request: FastifyRequest<{ Headers: { userId: string }
     return user;
 }
 
-export const usersCrtler = {
+export const usersHandler = {
     getUserById
 };
