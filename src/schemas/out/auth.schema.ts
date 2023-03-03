@@ -1,7 +1,7 @@
 import s from "fluent-json-schema";
-import { idSchema } from "../common";
+import { idSchema } from "../common.schema";
 
-export const loginResultSchema = s
+export const authResultSchema = s
     .object()
     .prop("id", idSchema)
     .prop("email", s.string().examples(["npvinh0507@gmail.com"]));

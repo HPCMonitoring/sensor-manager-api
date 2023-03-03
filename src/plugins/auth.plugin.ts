@@ -1,7 +1,7 @@
 import { SwaggerControllerTag } from "@constants";
 import { authCtrler } from "@controllers";
-import { loginSchema } from "@schemas/in";
-import { loginResultSchema } from "@schemas/out";
+import { authInputSchema } from "@schemas/in";
+import { authResultSchema } from "@schemas/out";
 import { swaggerTagRoutes } from "@utils";
 import { FastifyInstance, RouteOptions } from "fastify";
 
@@ -11,12 +11,23 @@ export async function authPlugin(app: FastifyInstance) {
             method: "POST",
             url: "/login",
             schema: {
-                body: loginSchema,
+                body: authInputSchema,
                 response: {
-                    200: loginResultSchema
+                    200: authResultSchema
                 }
             },
             handler: authCtrler.login
+        },
+        {
+            method: "POST",
+            url: "/signup",
+            schema: {
+                body: authInputSchema,
+                response: {
+                    200: authResultSchema
+                }
+            },
+            handler: authCtrler.signup
         }
     ];
 
