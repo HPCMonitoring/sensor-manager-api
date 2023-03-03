@@ -11,6 +11,7 @@ env:
   IMAGE_NAME: hpcmonitoring/sensor-manager-api
   IMAGE_TAG: 0.1.0
   ORG_USERNAME: hpcmonitoring
+  POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@sensormanagerdb:5432/${{ secrets.POSTGRES_DB }}?schema=public
 
 permissions:
   packages: write
@@ -26,6 +27,7 @@ jobs:
       - name: Set up env file
         run: |
           echo > .env.production
+          echo POSTGRES_URL=${{ env.POSTGRES_URL }} > .env.production
           echo COOKIE_SECRET=${{ secrets.COOKIE_SECRET }} >> .env.production
           echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env.production
           echo CORS_WHITE_LIST=${{ vars.CORS_WHITE_LIST }} >> .env.production
