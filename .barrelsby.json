@@ -1,6 +1,6 @@
 {
     "directory": [
-        "./src/controllers",
+        "./src/handlers",
         "./src/constants",
         "./src/schemas/in",
         "./src/schemas/out",

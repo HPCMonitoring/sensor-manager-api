@@ -24,8 +24,8 @@ export function createServer(config: ServerConfig) {
         app.register(import("@fastify/swagger-ui"), swaggerUIConfig);
     }
 
-    app.register(apiPlugin, { prefix: "/api" });
     app.register(authPlugin, { prefix: "/auth" });
+    app.register(apiPlugin, { prefix: "/api" });
 
     app.ready().then(() => {
         app.swagger({ yaml: true });

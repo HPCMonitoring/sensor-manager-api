@@ -32,9 +32,10 @@ async function getAll(): Result<GetAllClusters> {
 
 async function create(request: FastifyRequest<{ Body: ClusterInput }>, reply: FastifyReply): Result<Cluster> {
     try {
-        return prisma.cluster.create({
+        const cluster = prisma.cluster.create({
             data: request.body
         });
+        return cluster;
     } catch (err) {
         return reply.badRequest(DUPLICATED_CLUSTER);
     }
@@ -48,12 +49,13 @@ async function update(
     reply: FastifyReply
 ): Result<Cluster> {
     try {
-        return prisma.cluster.update({
+        const cluster = await prisma.cluster.update({
             data: request.body,
             where: { id: request.params.clusterId }
         });
+        return cluster;
     } catch (err) {
-        return reply.badRequest(DUPLICATED_CLUSTER);
+        return reply.badRequest(CLUSTER_NOT_EXISTS);
     }
 }
 
@@ -75,7 +77,7 @@ async function deleteCluster(
     }
 }
 
-export const clusterCtrler = {
+export const clustersHandler = {
     getAll,
     create,
     update,

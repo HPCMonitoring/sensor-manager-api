@@ -1,11 +1,11 @@
-import { SwaggerControllerTag } from "@constants";
-import { authCtrler } from "@controllers";
+import { HandlerTag } from "@constants";
+import { authHandler } from "@handlers";
 import { authInputSchema } from "@schemas/in";
 import { authResultSchema } from "@schemas/out";
 import { createPlugin } from "@utils";
 
 export const authPlugin = createPlugin(
-    [SwaggerControllerTag.AUTH],
+    [HandlerTag.AUTH],
     [
         {
             method: "POST",
@@ -16,7 +16,7 @@ export const authPlugin = createPlugin(
                     200: authResultSchema
                 }
             },
-            handler: authCtrler.login
+            handler: authHandler.login
         },
         {
             method: "POST",
@@ -27,7 +27,7 @@ export const authPlugin = createPlugin(
                     200: authResultSchema
                 }
             },
-            handler: authCtrler.signup
+            handler: authHandler.signup
         }
     ]
 );

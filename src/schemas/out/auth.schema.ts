@@ -1,5 +1,5 @@
+import { idSchema } from "@schemas/common";
 import s from "fluent-json-schema";
-import { idSchema } from "../common.schema";
 
 export const authResultSchema = s
     .object()

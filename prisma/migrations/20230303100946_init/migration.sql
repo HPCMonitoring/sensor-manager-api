@@ -22,12 +22,13 @@ CREATE TABLE "Cluster" (
 -- CreateTable
 CREATE TABLE "Sensor" (
     "id" TEXT NOT NULL,
+    "ipAddr" TEXT NOT NULL,
     "name" VARCHAR(50) NOT NULL,
-    "kernelName" VARCHAR(100),
-    "kernelVersion" VARCHAR(50),
-    "arch" VARCHAR(25),
-    "hostname" VARCHAR(100),
-    "rootUser" VARCHAR(50),
+    "kernelName" VARCHAR(100) NOT NULL,
+    "kernelVersion" VARCHAR(50) NOT NULL,
+    "arch" VARCHAR(25) NOT NULL,
+    "hostname" VARCHAR(100) NOT NULL,
+    "rootUser" VARCHAR(50) NOT NULL,
     "remarks" TEXT,
     "status" "SensorStatus" NOT NULL DEFAULT 'REQUESTED',
     "clusterId" TEXT NOT NULL,
@@ -95,13 +96,13 @@ CREATE UNIQUE INDEX "KafkaTopic_brokerId_name_key" ON "KafkaTopic"("brokerId", "
 CREATE UNIQUE INDEX "SensorConfig_sensorId_kafkaTopicId_key" ON "SensorConfig"("sensorId", "kafkaTopicId");
 
 -- AddForeignKey
-ALTER TABLE "Sensor" ADD CONSTRAINT "Sensor_clusterId_fkey" FOREIGN KEY ("clusterId") REFERENCES "Cluster"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Sensor" ADD CONSTRAINT "Sensor_clusterId_fkey" FOREIGN KEY ("clusterId") REFERENCES "Cluster"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "KafkaTopic" ADD CONSTRAINT "KafkaTopic_brokerId_fkey" FOREIGN KEY ("brokerId") REFERENCES "KafkaBroker"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_sensorId_fkey" FOREIGN KEY ("sensorId") REFERENCES "Sensor"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_sensorId_fkey" FOREIGN KEY ("sensorId") REFERENCES "Sensor"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_kafkaTopicId_fkey" FOREIGN KEY ("kafkaTopicId") REFERENCES "KafkaTopic"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_kafkaTopicId_fkey" FOREIGN KEY ("kafkaTopicId") REFERENCES "KafkaTopic"("id") ON DELETE CASCADE ON UPDATE CASCADE;

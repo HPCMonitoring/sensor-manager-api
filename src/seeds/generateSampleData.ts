@@ -27,26 +27,55 @@ async function generateSampleData() {
     });
 
     console.log(sampleUser);
-    await prisma.cluster.create({
+
+    const cluster = await prisma.cluster.create({
         data: {
             name: "BK HPC Laboratory",
-            remarks: "Some notes ...",
-            sensors: {
-                createMany: {
-                    data: [
-                        {
-                            name: "Sensor 1",
-                            status: SensorStatus.REQUESTED
-                        },
-                        {
-                            name: "Sensor 2",
-                            status: SensorStatus.RUNNING
-                        }
-                    ]
-                }
-            }
+            remarks: "Some notes ..."
         }
     });
+
+    await prisma.sensor.createMany({
+        data: [
+            {
+                name: "Sensor 1",
+                remarks: "Sample sensors",
+                ipAddr: "14.255.37.12",
+                status: SensorStatus.REQUESTED,
+                clusterId: cluster.id,
+                kernelName: "Linux",
+                kernelVersion: "5.19.0-32-generic",
+                arch: "x86_64",
+                hostname: "PhucVinh",
+                rootUser: "root"
+            },
+            {
+                name: "Sensor 2",
+                remarks: "Sample sensors",
+                ipAddr: "14.255.37.145",
+                status: SensorStatus.RUNNING,
+                clusterId: cluster.id,
+                kernelName: "Linux",
+                kernelVersion: "5.19.0-32-generic",
+                arch: "x86_64",
+                hostname: "PhucVinh",
+                rootUser: "root"
+            },
+            {
+                name: "Sensor 3",
+                remarks: "Sample sensors",
+                ipAddr: "14.255.94.235",
+                status: SensorStatus.STOPPED,
+                clusterId: cluster.id,
+                kernelName: "Linux",
+                kernelVersion: "5.19.0-32-generic",
+                arch: "x86_64",
+                hostname: "PhucVinh",
+                rootUser: "root"
+            }
+        ]
+    });
+
     const broker = await prisma.kafkaBroker.create({
         data: {
             url: "http://localhost:9092",

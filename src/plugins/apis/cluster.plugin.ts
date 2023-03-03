@@ -1,5 +1,5 @@
-import { SwaggerControllerTag } from "@constants";
-import { clusterCtrler } from "@controllers";
+import { HandlerTag } from "@constants";
+import { clustersHandler } from "@handlers";
 import { idSchema } from "@schemas/common";
 import { clusterInputSchema } from "@schemas/in";
 import { clusterSchema, getAllClustersSchema } from "@schemas/out";
@@ -7,7 +7,7 @@ import { createPlugin } from "@utils";
 import s from "fluent-json-schema";
 
 export const clusterPlugin = createPlugin(
-    [SwaggerControllerTag.CLUSTER],
+    [HandlerTag.CLUSTER],
     [
         {
             method: "GET",
@@ -17,7 +17,7 @@ export const clusterPlugin = createPlugin(
                     200: getAllClustersSchema
                 }
             },
-            handler: clusterCtrler.getAll
+            handler: clustersHandler.getAll
         },
         {
             method: "POST",
@@ -28,7 +28,7 @@ export const clusterPlugin = createPlugin(
                     200: clusterSchema
                 }
             },
-            handler: clusterCtrler.create
+            handler: clustersHandler.create
         },
         {
             method: "PUT",
@@ -40,7 +40,7 @@ export const clusterPlugin = createPlugin(
                     200: clusterSchema
                 }
             },
-            handler: clusterCtrler.update
+            handler: clustersHandler.update
         },
         {
             method: "DELETE",
@@ -51,7 +51,7 @@ export const clusterPlugin = createPlugin(
                     200: clusterSchema
                 }
             },
-            handler: clusterCtrler.delete
+            handler: clustersHandler.delete
         }
     ]
 );

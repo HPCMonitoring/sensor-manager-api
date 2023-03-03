@@ -1,10 +1,10 @@
-import { SwaggerControllerTag } from "@constants";
-import { usersCrtler } from "@controllers";
+import { HandlerTag } from "@constants";
+import { usersHandler } from "@handlers";
 import { getUserSchema } from "@schemas/out";
 import { createPlugin } from "@utils";
 
 export const userPlugin = createPlugin(
-    [SwaggerControllerTag.USER],
+    [HandlerTag.USER],
     [
         {
             method: "GET",
@@ -14,7 +14,7 @@ export const userPlugin = createPlugin(
                     200: getUserSchema
                 }
             },
-            handler: usersCrtler.getUserById
+            handler: usersHandler.getUserById
         }
     ]
 );
