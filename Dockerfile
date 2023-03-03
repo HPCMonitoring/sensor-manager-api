@@ -8,10 +8,10 @@ COPY package.json yarn.lock tsconfig.json tsconfig.compile.json jest.config.js .
 COPY ./src ./src
 COPY ./prisma ./prisma
 
-## for yarn prisma:generate (prisma/schema.prisma only can read environment from .env file)
+## for yarn db:generate (prisma/schema.prisma only can read environment from .env file)
 COPY .env.production .env 
 
-RUN yarn install --prod && yarn prisma:generate
+RUN yarn install --prod && yarn db:generate
 RUN yarn add -D jest @types/jest ts-jest
 RUN yarn test
 
