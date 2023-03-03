@@ -39,7 +39,7 @@ model Sensor {
   rootUser      String?        @db.VarChar(50)
   remarks       String?
   status        SensorStatus   @default(REQUESTED)
-  cluster       Cluster        @relation(fields: [clusterId], references: [id])
+  cluster       Cluster        @relation(fields: [clusterId], references: [id], onDelete: Cascade)
   clusterId     String
   configs       SensorConfig[]
 
@@ -65,8 +65,8 @@ model KafkaTopic {
 
 model SensorConfig {
   id           String     @id @default(cuid())
-  sensor       Sensor     @relation(fields: [sensorId], references: [id])
-  kafkaTopic   KafkaTopic @relation(fields: [kafkaTopicId], references: [id])
+  sensor       Sensor     @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  kafkaTopic   KafkaTopic @relation(fields: [kafkaTopicId], references: [id], onDelete: Cascade)
   interval     Int
   sql          String
   sensorId     String

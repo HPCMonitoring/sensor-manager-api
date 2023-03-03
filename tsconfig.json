@@ -36,7 +36,7 @@
             "@schemas/in/*": ["src/schemas/in/*"],
             "@schemas/out": ["src/schemas/out"],
             "@schemas/out/*": ["src/schemas/out/*"],
-            "@schemas/common": ["src/schemas/common"],
+            "@schemas/common": ["src/schemas/common.schema"],
             "@configs": ["src/configs"],
             "@configs/*": ["src/configs/*"],
             "@types": ["src/types"],
