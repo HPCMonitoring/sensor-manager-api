@@ -1,17 +1,19 @@
 import { USER_NOT_FOUND } from "@constants";
 import { prisma } from "@repositories";
+import { GetUser } from "@schemas/out";
+import { Result } from "@types";
 import { FastifyReply, FastifyRequest } from "fastify";
 
-async function getUserById(request: FastifyRequest<{ Headers: { userId: string } }>, reply: FastifyReply) {
+async function getUserById(request: FastifyRequest<{ Headers: { userId: string } }>, reply: FastifyReply): Result<GetUser> {
     const userId: string = request.headers.userId;
-    const user = prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
         select: {
             id: true,
             email: true
         },
         where: { id: userId }
     });
-    if (!user) return reply.badRequest(USER_NOT_FOUND);
+    if (user === null) return reply.badRequest(USER_NOT_FOUND);
     return user;
 }
 

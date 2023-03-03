@@ -5,16 +5,11 @@ import { cookieOptions, DUPLICATED_EMAIL, LOGIN_FAIL, SALT_ROUNDS, USER_NOT_FOUN
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@configs";
 import { User } from "@prisma/client";
+import { AuthInput } from "@schemas/in";
+import { AuthOutput } from "@schemas/out";
+import { Result } from "@types";
 
-async function login(
-    request: FastifyRequest<{
-        Body: {
-            email: string;
-            password: string;
-        };
-    }>,
-    reply: FastifyReply
-) {
+async function login(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Result<AuthOutput> {
     const user = await prisma.user.findUnique({
         select: {
             id: true,
@@ -37,15 +32,7 @@ async function login(
     };
 }
 
-async function signup(
-    request: FastifyRequest<{
-        Body: {
-            email: string;
-            password: string;
-        };
-    }>,
-    reply: FastifyReply
-) {
+async function signup(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Promise<AuthOutput | void> {
     const hashPassword = await hash(request.body.password, SALT_ROUNDS);
     let user: User;
     try {

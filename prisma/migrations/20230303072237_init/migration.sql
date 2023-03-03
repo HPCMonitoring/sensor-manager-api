@@ -1,7 +1,10 @@
+-- CreateEnum
+CREATE TYPE "SensorStatus" AS ENUM ('RUNNING', 'STOPPED', 'REQUESTED', 'DISCONNECTED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "username" VARCHAR(50) NOT NULL,
+    "email" VARCHAR(50) NOT NULL,
     "password" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -12,7 +15,6 @@ CREATE TABLE "Cluster" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "remarks" TEXT,
-    "userId" TEXT NOT NULL,
 
     CONSTRAINT "Cluster_pkey" PRIMARY KEY ("id")
 );
@@ -20,8 +22,14 @@ CREATE TABLE "Cluster" (
 -- CreateTable
 CREATE TABLE "Sensor" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "name" VARCHAR(50) NOT NULL,
+    "kernelName" VARCHAR(100),
+    "kernelVersion" VARCHAR(50),
+    "arch" VARCHAR(25),
+    "hostname" VARCHAR(100),
+    "rootUser" VARCHAR(50),
     "remarks" TEXT,
+    "status" "SensorStatus" NOT NULL DEFAULT 'REQUESTED',
     "clusterId" TEXT NOT NULL,
 
     CONSTRAINT "Sensor_pkey" PRIMARY KEY ("id")
@@ -32,7 +40,6 @@ CREATE TABLE "KafkaBroker" (
     "id" TEXT NOT NULL,
     "url" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
 
     CONSTRAINT "KafkaBroker_pkey" PRIMARY KEY ("id")
 );
@@ -60,18 +67,17 @@ CREATE TABLE "SensorConfig" (
 -- CreateTable
 CREATE TABLE "FilterTemplate" (
     "id" TEXT NOT NULL,
-    "sql" TEXT NOT NULL,
-    "interval" INTEGER NOT NULL,
-    "userId" TEXT NOT NULL,
+    "script" TEXT NOT NULL,
+    "interval" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "FilterTemplate_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Cluster_userId_name_key" ON "Cluster"("userId", "name");
+CREATE UNIQUE INDEX "Cluster_name_key" ON "Cluster"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Sensor_clusterId_name_key" ON "Sensor"("clusterId", "name");
@@ -80,7 +86,7 @@ CREATE UNIQUE INDEX "Sensor_clusterId_name_key" ON "Sensor"("clusterId", "name")
 CREATE UNIQUE INDEX "KafkaBroker_url_key" ON "KafkaBroker"("url");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "KafkaBroker_userId_name_key" ON "KafkaBroker"("userId", "name");
+CREATE UNIQUE INDEX "KafkaBroker_name_key" ON "KafkaBroker"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "KafkaTopic_brokerId_name_key" ON "KafkaTopic"("brokerId", "name");
@@ -89,13 +95,7 @@ CREATE UNIQUE INDEX "KafkaTopic_brokerId_name_key" ON "KafkaTopic"("brokerId", "
 CREATE UNIQUE INDEX "SensorConfig_sensorId_kafkaTopicId_key" ON "SensorConfig"("sensorId", "kafkaTopicId");
 
 -- AddForeignKey
-ALTER TABLE "Cluster" ADD CONSTRAINT "Cluster_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Sensor" ADD CONSTRAINT "Sensor_clusterId_fkey" FOREIGN KEY ("clusterId") REFERENCES "Cluster"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "KafkaBroker" ADD CONSTRAINT "KafkaBroker_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "KafkaTopic" ADD CONSTRAINT "KafkaTopic_brokerId_fkey" FOREIGN KEY ("brokerId") REFERENCES "KafkaBroker"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -105,6 +105,3 @@ ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_sensorId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_kafkaTopicId_fkey" FOREIGN KEY ("kafkaTopicId") REFERENCES "KafkaTopic"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "FilterTemplate" ADD CONSTRAINT "FilterTemplate_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

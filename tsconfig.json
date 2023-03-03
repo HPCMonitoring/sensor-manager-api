@@ -43,8 +43,6 @@
             "@types/*": ["src/types/*"],
             "@repositories": ["src/prisma"],
             "@utils": ["src/utils"],
-            "@plugins": ["src/plugins"],
-            "@plugins/*": ["src/plugins/*"],
             "@middlewares": ["src/middlewares"],
             "@middlewares/*": ["src/middlewares/*"],
         }

@@ -1,7 +1,7 @@
 import fastify from "fastify";
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
-import { authPlugin, apiPlugin } from "@plugins";
+import { authPlugin, apiPlugin } from "./plugins";
 import { ServerConfig } from "@types";
 
 export function createServer(config: ServerConfig) {

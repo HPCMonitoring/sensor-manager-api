@@ -3,4 +3,5 @@
  */
 
 export * from "./auth.schema";
+export * from "./clusters.schema";
 export * from "./user.schema";
