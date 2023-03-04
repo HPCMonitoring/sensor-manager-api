@@ -82,17 +82,28 @@ async function generateSampleData() {
             name: "Localhost"
         }
     });
-    await prisma.kafkaTopic.create({
+    const kafkaTopic = await prisma.kafkaTopic.create({
         data: {
             name: "hello-world-topic",
             brokerId: broker.id
         }
     });
-    await prisma.filterTemplate.create({
+    const filterTemplate = await prisma.filterTemplate.create({
         data: {
             script: yamlScript,
             interval: 10
         }
+    });
+
+    const sensors = await prisma.sensor.findMany();
+    await prisma.sensorTopicConfig.createMany({
+        data: sensors.map((sensor) => ({
+            script: yamlScript,
+            kafkaTopicId: kafkaTopic.id,
+            interval: 10,
+            filterTemplateId: filterTemplate.id,
+            sensorId: sensor.id
+        }))
     });
     process.exit(0);
 }

@@ -1,7 +1,8 @@
+import { SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
-import { GetAllSensors } from "@schemas/out";
+import { GetAllSensors, GetSensor } from "@schemas/out";
 import { Result } from "@types";
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 
 async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<GetAllSensors> {
     return prisma.sensor.findMany({
@@ -18,6 +19,69 @@ async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId
     });
 }
 
+async function getById(
+    request: FastifyRequest<{
+        Params: { sensorId: string };
+    }>,
+    reply: FastifyReply
+): Result<GetSensor> {
+    const topicConfigsQuery = {
+        select: {
+            kafkaTopic: {
+                select: {
+                    id: true,
+                    name: true,
+                    broker: { select: { id: true, name: true } }
+                }
+            },
+            script: true,
+            interval: true,
+            filterTemplateId: true
+        }
+    };
+    const sensor = await prisma.sensor.findUnique({
+        select: {
+            id: true,
+            name: true,
+            remarks: true,
+            ipAddr: true,
+            status: true,
+            kernelName: true,
+            kernelVersion: true,
+            arch: true,
+            hostname: true,
+            rootUser: true,
+            topicConfigs: topicConfigsQuery
+        },
+        where: {
+            id: request.params.sensorId
+        }
+    });
+    if (!sensor) return reply.badRequest(SENSOR_NOT_EXISTS);
+    return {
+        id: sensor.id,
+        name: sensor.name,
+        remarks: sensor.remarks,
+        ipAddr: sensor.ipAddr,
+        status: sensor.status,
+        kernelName: sensor.kernelName,
+        kernelVersion: sensor.kernelVersion,
+        arch: sensor.arch,
+        hostname: sensor.hostname,
+        rootUser: sensor.rootUser,
+        subscribingTopics: sensor.topicConfigs.map((topicConfig) => ({
+            id: topicConfig.kafkaTopic.id,
+            name: topicConfig.kafkaTopic.name,
+            interval: topicConfig.interval,
+            script: topicConfig.script,
+            brokerId: topicConfig.kafkaTopic.broker.id,
+            brokerName: topicConfig.kafkaTopic.broker.name,
+            usingTemplateId: topicConfig.filterTemplateId
+        }))
+    };
+}
+
 export const sensorHandler = {
-    getByClusterId
+    getByClusterId,
+    getById
 };

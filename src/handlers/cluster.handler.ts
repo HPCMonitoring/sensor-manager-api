@@ -2,7 +2,7 @@ import { CLUSTER_NOT_EXISTS, DUPLICATED_CLUSTER } from "@constants";
 import { SensorStatus } from "@prisma/client";
 import { prisma } from "@repositories";
 import { ClusterInput } from "@schemas/in";
-import { Cluster, GetAllClusters } from "@schemas/out";
+import { GetCluster, GetAllClusters } from "@schemas/out";
 import { Result } from "@types";
 import { FastifyReply, FastifyRequest } from "fastify";
 
@@ -30,7 +30,7 @@ async function getAll(): Result<GetAllClusters> {
     }));
 }
 
-async function create(request: FastifyRequest<{ Body: ClusterInput }>, reply: FastifyReply): Result<Cluster> {
+async function create(request: FastifyRequest<{ Body: ClusterInput }>, reply: FastifyReply): Result<GetCluster> {
     try {
         const cluster = prisma.cluster.create({
             data: request.body
@@ -47,7 +47,7 @@ async function update(
         Params: { clusterId: string };
     }>,
     reply: FastifyReply
-): Result<Cluster> {
+): Result<GetCluster> {
     try {
         const cluster = await prisma.cluster.update({
             data: request.body,
@@ -64,7 +64,7 @@ async function deleteCluster(
         Params: { clusterId: string };
     }>,
     reply: FastifyReply
-): Result<Cluster> {
+): Result<GetCluster> {
     try {
         return prisma.cluster.delete({
             where: {

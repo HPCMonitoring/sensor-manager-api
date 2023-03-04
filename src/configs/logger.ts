@@ -3,9 +3,10 @@ import { PinoLoggerOptions } from "fastify/types/logger";
 import { Environment } from "@types";
 
 const errorSerialize = (err: FastifyError) => {
+    const isInternalServerError = !err.statusCode || (err.statusCode && err.statusCode);
     return {
         type: err.name,
-        stack: err.statusCode && err.statusCode >= 500 && err.stack ? err.stack : "null",
+        stack: isInternalServerError && err.stack ? err.stack : "null",
         message: err.message,
         statusCode: err.statusCode
     };

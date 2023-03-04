@@ -7,7 +7,7 @@ export const clusterSchema = s
     .prop("name", s.string())
     .prop("remarks", s.string().raw({ nullable: true }).examples(["Some notes ..."]));
 
-export type Cluster = {
+export type GetCluster = {
     id: string;
     name: string;
     remarks: string | null;
@@ -24,7 +24,7 @@ export const getAllClustersSchema = s.array().items(
 );
 
 export type GetAllClusters = Array<
-    Cluster & {
+    GetCluster & {
         numOfSensors: number;
         numOfActiveSensors: number;
     }
