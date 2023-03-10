@@ -1,5 +1,4 @@
 import { CLUSTER_NOT_EXISTS, DUPLICATED_CLUSTER } from "@constants";
-import { SensorStatus } from "@prisma/client";
 import { prisma } from "@repositories";
 import { ClusterInput } from "@schemas/in";
 import { GetCluster, GetAllClusters } from "@schemas/out";
@@ -14,8 +13,7 @@ async function getAll(): Result<GetAllClusters> {
             remarks: true,
             sensors: {
                 select: {
-                    id: true,
-                    status: true
+                    id: true
                 }
             }
         }
@@ -26,7 +24,7 @@ async function getAll(): Result<GetAllClusters> {
         name: cluster.name,
         remarks: cluster.remarks,
         numOfSensors: cluster.sensors.length,
-        numOfActiveSensors: cluster.sensors.filter((sensor) => sensor.status === SensorStatus.RUNNING).length
+        numOfActiveSensors: 1 // Todo: Fix hard code
     }));
 }
 

@@ -10,8 +10,7 @@ async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId
             id: true,
             name: true,
             ipAddr: true,
-            remarks: true,
-            status: true
+            remarks: true
         },
         where: {
             clusterId: request.query.clusterId
@@ -45,7 +44,6 @@ async function getById(
             name: true,
             remarks: true,
             ipAddr: true,
-            status: true,
             kernelName: true,
             kernelVersion: true,
             arch: true,
@@ -63,7 +61,6 @@ async function getById(
         name: sensor.name,
         remarks: sensor.remarks,
         ipAddr: sensor.ipAddr,
-        status: sensor.status,
         kernelName: sensor.kernelName,
         kernelVersion: sensor.kernelVersion,
         arch: sensor.arch,

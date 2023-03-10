@@ -4,26 +4,24 @@ on:
   pull_request:
     branches: ["master"]
 
-env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
-  # Image name MUST have a pattern like <org_name_lowercase>/<repo_name_lowercase>
-  IMAGE_NAME: hpcmonitoring/sensor-manager-api
-  IMAGE_TAG: 0.1.0
-  ORG_USERNAME: hpcmonitoring
-  POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@sensormanagerdb:5432/${{ secrets.POSTGRES_DB }}?schema=public
-
-permissions:
-  packages: write
-
 jobs:
-  build-and-test:
-    name: Build and test
+  test:
+    name: Test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+
     steps:
       - uses: actions/checkout@v3
         name: Checkout repository
 
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+      
       - name: Set up env file
         run: |
           echo > .env.production
@@ -32,21 +30,11 @@ jobs:
           echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env.production
           echo CORS_WHITE_LIST=${{ vars.CORS_WHITE_LIST }} >> .env.production
 
-      - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          version: v0.9.1
+      - name: Install dependencies
+        run: yarn
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ env.ORG_USERNAME }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Test
+        run: yarn lint && yarn test
 
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: false
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+      - name: Build
+        run: yarn build

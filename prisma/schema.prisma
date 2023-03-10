@@ -39,7 +39,7 @@ model Sensor {
   hostname      String         @db.VarChar(100)
   rootUser      String         @db.VarChar(50)
   remarks       String?
-  status        SensorStatus   @default(REQUESTED)
+  // status        SensorStatus   @default(REQUESTED)
   cluster       Cluster        @relation(fields: [clusterId], references: [id], onDelete: Cascade)
   clusterId     String
   topicConfigs  SensorTopicConfig[]
@@ -85,9 +85,9 @@ model FilterTemplate {
   SensorConfig SensorTopicConfig[]
 }
 
-enum SensorStatus {
-  RUNNING // Sensor is connecting to server, and doing it jobs
-  STOPPED // Sensor is connecting to server, and not doing anythings
-  REQUESTED // Sensor registered with server, and waiting to be accepted
-  DISCONNECTED // Sensor lost connection with server
-}
+// enum SensorStatus {
+//   RUNNING // Sensor is connecting to server, and doing it jobs
+//   STOPPED // Sensor is connecting to server, and not doing anythings
+//   REQUESTED // Sensor registered with server, and waiting to be accepted
+//   DISCONNECTED // Sensor lost connection with server
+// }

@@ -1,7 +1,6 @@
 import { prisma } from "../prisma";
 import { hashSync } from "bcrypt";
 import { SALT_ROUNDS } from "../constants/crypt";
-import { SensorStatus } from "@prisma/client";
 
 const user = {
     email: "npvinh0507@gmail.com",
@@ -41,7 +40,6 @@ async function generateSampleData() {
                 name: "Sensor 1",
                 remarks: "Sample sensors",
                 ipAddr: "14.255.37.12",
-                status: SensorStatus.REQUESTED,
                 clusterId: cluster.id,
                 kernelName: "Linux",
                 kernelVersion: "5.19.0-32-generic",
@@ -53,7 +51,6 @@ async function generateSampleData() {
                 name: "Sensor 2",
                 remarks: "Sample sensors",
                 ipAddr: "14.255.37.145",
-                status: SensorStatus.RUNNING,
                 clusterId: cluster.id,
                 kernelName: "Linux",
                 kernelVersion: "5.19.0-32-generic",
@@ -65,7 +62,6 @@ async function generateSampleData() {
                 name: "Sensor 3",
                 remarks: "Sample sensors",
                 ipAddr: "14.255.94.235",
-                status: SensorStatus.STOPPED,
                 clusterId: cluster.id,
                 kernelName: "Linux",
                 kernelVersion: "5.19.0-32-generic",
