@@ -39,10 +39,10 @@ model Sensor {
   hostname      String         @db.VarChar(100)
   rootUser      String         @db.VarChar(50)
   remarks       String?
-  status        SensorStatus   @default(REQUESTED)
+  // status        SensorStatus   @default(REQUESTED)
   cluster       Cluster        @relation(fields: [clusterId], references: [id], onDelete: Cascade)
   clusterId     String
-  configs       SensorConfig[]
+  topicConfigs  SensorTopicConfig[]
 
   @@unique([clusterId, name])
 }
@@ -59,32 +59,35 @@ model KafkaTopic {
   name          String
   broker        KafkaBroker    @relation(fields: [brokerId], references: [id])
   brokerId      String
-  sensorConfigs SensorConfig[]
+  sensorConfigs SensorTopicConfig[]
 
   @@unique([brokerId, name])
 }
 
-model SensorConfig {
-  id           String     @id @default(cuid())
-  sensor       Sensor     @relation(fields: [sensorId], references: [id], onDelete: Cascade)
-  kafkaTopic   KafkaTopic @relation(fields: [kafkaTopicId], references: [id], onDelete: Cascade)
-  interval     Int
-  sql          String
-  sensorId     String
-  kafkaTopicId String
+model SensorTopicConfig {
+  id               String          @id @default(cuid())
+  sensor           Sensor          @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  kafkaTopic       KafkaTopic      @relation(fields: [kafkaTopicId], references: [id], onDelete: Cascade)
+  interval         Float
+  script           String
+  sensorId         String
+  kafkaTopicId     String
+  usingTemplate    FilterTemplate? @relation(fields: [filterTemplateId], references: [id])
+  filterTemplateId String?
 
   @@unique([sensorId, kafkaTopicId])
 }
 
 model FilterTemplate {
-  id       String @id @default(cuid())
-  script   String
-  interval Float
+  id           String         @id @default(cuid())
+  script       String
+  interval     Float
+  SensorConfig SensorTopicConfig[]
 }
 
-enum SensorStatus {
-  RUNNING // Sensor is connecting to server, and doing it jobs
-  STOPPED // Sensor is connecting to server, and not doing anythings
-  REQUESTED // Sensor registered with server, and waiting to be accepted
-  DISCONNECTED // Sensor lost connection with server
-}
+// enum SensorStatus {
+//   RUNNING // Sensor is connecting to server, and doing it jobs
+//   STOPPED // Sensor is connecting to server, and not doing anythings
+//   REQUESTED // Sensor registered with server, and waiting to be accepted
+//   DISCONNECTED // Sensor lost connection with server
+// }

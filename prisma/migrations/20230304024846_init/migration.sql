@@ -57,10 +57,11 @@ CREATE TABLE "KafkaTopic" (
 -- CreateTable
 CREATE TABLE "SensorConfig" (
     "id" TEXT NOT NULL,
-    "interval" INTEGER NOT NULL,
-    "sql" TEXT NOT NULL,
+    "interval" DOUBLE PRECISION NOT NULL,
+    "script" TEXT NOT NULL,
     "sensorId" TEXT NOT NULL,
     "kafkaTopicId" TEXT NOT NULL,
+    "filterTemplateId" TEXT,
 
     CONSTRAINT "SensorConfig_pkey" PRIMARY KEY ("id")
 );
@@ -106,3 +107,6 @@ ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_sensorId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_kafkaTopicId_fkey" FOREIGN KEY ("kafkaTopicId") REFERENCES "KafkaTopic"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SensorConfig" ADD CONSTRAINT "SensorConfig_filterTemplateId_fkey" FOREIGN KEY ("filterTemplateId") REFERENCES "FilterTemplate"("id") ON DELETE SET NULL ON UPDATE CASCADE;
