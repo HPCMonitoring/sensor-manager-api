@@ -2,7 +2,6 @@ import { CLUSTER_NOT_EXISTS, DUPLICATED_CLUSTER } from "@constants";
 import { prisma } from "@repositories";
 import { ClusterInput } from "@schemas/in";
 import { GetCluster, GetAllClusters } from "@schemas/out";
-import { Result } from "@types";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 async function getAll(): Result<GetAllClusters> {

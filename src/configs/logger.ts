@@ -1,6 +1,5 @@
 import { FastifyError, FastifyLoggerOptions } from "fastify";
 import { PinoLoggerOptions } from "fastify/types/logger";
-import { Environment } from "@types";
 
 const errorSerialize = (err: FastifyError) => {
     const isInternalServerError = !err.statusCode || (err.statusCode && err.statusCode);

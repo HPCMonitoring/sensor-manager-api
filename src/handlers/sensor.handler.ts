@@ -1,11 +1,10 @@
 import { SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
 import { GetAllSensors, GetSensor } from "@schemas/out";
-import { Result } from "@types";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<GetAllSensors> {
-    return prisma.sensor.findMany({
+    const sensors = await prisma.sensor.findMany({
         select: {
             id: true,
             name: true,
@@ -16,6 +15,7 @@ async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId
             clusterId: request.query.clusterId
         }
     });
+    return sensors.map((sensor) => ({ ...sensor, state: "RUNNING" }));
 }
 
 async function getById(

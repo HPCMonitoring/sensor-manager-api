@@ -1,0 +1,1 @@
+type SensorState = "RUNNING" | "STOPPED" | "DISCONNECTED" | "REQUESTED";
