@@ -7,7 +7,6 @@ import { JWT_SECRET } from "@configs";
 import { User } from "@prisma/client";
 import { AuthInput } from "@schemas/in";
 import { AuthOutput } from "@schemas/out";
-import { Result } from "@types";
 
 async function login(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Result<AuthOutput> {
     const user = await prisma.user.findUnique({

@@ -1,14 +1,25 @@
 import { idSchema, nullable } from "@schemas/common";
 import s from "fluent-json-schema";
 
+const allSensorStates: SensorState[] = ["RUNNING", "STOPPED", "DISCONNECTED", "REQUESTED"];
+
 export const getAllSensorsSchema = s
     .array()
-    .items(s.object().prop("id", s.string()).prop("name", s.string()).prop("ipAddr", s.string()).prop("remarks", s.string().raw(nullable)));
+    .items(
+        s
+            .object()
+            .prop("id", s.string())
+            .prop("name", s.string())
+            .prop("ipAddr", s.string())
+            .prop("remarks", s.string().raw(nullable))
+            .prop("state", s.enum(allSensorStates))
+    );
 export type GetAllSensors = Array<{
     id: string;
     name: string;
     ipAddr: string;
     remarks: string | null;
+    state: SensorState;
 }>;
 
 export const getSensorSchema = s
