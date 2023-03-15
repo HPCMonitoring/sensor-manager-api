@@ -1,9 +1,9 @@
 import { SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
-import { GetAllSensors, SensorDetailDto } from "@schemas/out";
+import { SensorDetailDto, SensorSummaryDto } from "@schemas/out";
 import { FastifyReply, FastifyRequest } from "fastify";
 
-async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<GetAllSensors> {
+async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<SensorSummaryDto[]> {
     const sensors = await prisma.sensor.findMany({
         select: {
             id: true,
@@ -24,20 +24,6 @@ async function getById(
     }>,
     reply: FastifyReply
 ): Result<SensorDetailDto> {
-    const topicConfigsQuery = {
-        select: {
-            kafkaTopic: {
-                select: {
-                    id: true,
-                    name: true,
-                    broker: { select: { id: true, name: true } }
-                }
-            },
-            script: true,
-            interval: true,
-            filterTemplateId: true
-        }
-    };
     const sensor = await prisma.sensor.findUnique({
         select: {
             id: true,
@@ -49,12 +35,28 @@ async function getById(
             arch: true,
             hostname: true,
             rootUser: true,
-            topicConfigs: topicConfigsQuery
+            topicConfigs: {
+                select: {
+                    kafkaTopic: {
+                        select: {
+                            id: true,
+                            name: true,
+                            broker: { select: { id: true, name: true, url: true } }
+                        }
+                    },
+                    usingTemplate: {
+                        select: { id: true, name: true }
+                    },
+                    script: true,
+                    interval: true
+                }
+            }
         },
         where: {
             id: request.params.sensorId
         }
     });
+
     if (!sensor) return reply.badRequest(SENSOR_NOT_EXISTS);
     return {
         id: sensor.id,
@@ -66,14 +68,14 @@ async function getById(
         arch: sensor.arch,
         hostname: sensor.hostname,
         rootUser: sensor.rootUser,
+        state: "RUNNING",
         subscribingTopics: sensor.topicConfigs.map((topicConfig) => ({
             id: topicConfig.kafkaTopic.id,
             name: topicConfig.kafkaTopic.name,
             interval: topicConfig.interval,
             script: topicConfig.script,
-            brokerId: topicConfig.kafkaTopic.broker.id,
-            brokerName: topicConfig.kafkaTopic.broker.name,
-            usingTemplateId: topicConfig.filterTemplateId
+            broker: topicConfig.kafkaTopic.broker,
+            usingTemplate: topicConfig.usingTemplate
         }))
     };
 }

@@ -19,6 +19,31 @@ export type SensorSummaryDto = {
     state: SensorState;
 };
 
+const subscribingTopicSchema = s
+    .object()
+    .prop("id", idSchema)
+    .prop("name", s.string())
+    .prop("interval", s.number())
+    .prop("usingTemplate", s.object().raw(nullable).prop("id", idSchema).prop("name", s.string()))
+    .prop("script", s.string())
+    .prop("broker", s.object().prop("id", idSchema).prop("name", s.string()).prop("url", s.string()));
+
+type SubscribingTopicDto = {
+    id: string;
+    name: string;
+    interval: number;
+    usingTemplate: {
+        id: string;
+        name: string;
+    } | null;
+    script: string;
+    broker: {
+        id: string;
+        name: string;
+        url: string;
+    };
+};
+
 export const sensorDetailSchema = s
     .object()
     .prop("id", s.string())
@@ -30,22 +55,9 @@ export const sensorDetailSchema = s
     .prop("arch", s.string())
     .prop("hostname", s.string())
     .prop("rootUser", s.string())
-    .prop(
-        "subscribingTopics",
-        s
-            .array()
-            .items(
-                s
-                    .object()
-                    .prop("id", idSchema)
-                    .prop("name", s.string())
-                    .prop("interval", s.number())
-                    .prop("usingTemplateId", s.string().raw(nullable))
-                    .prop("script", s.string())
-                    .prop("brokerId", s.string())
-                    .prop("brokerName", s.string())
-            )
-    );
+    .prop("state", s.enum(allSensorStates))
+    .prop("subscribingTopics", s.array().items(subscribingTopicSchema));
+
 export type SensorDetailDto = {
     id: string;
     name: string;
@@ -56,13 +68,6 @@ export type SensorDetailDto = {
     arch: string;
     hostname: string;
     rootUser: string;
-    subscribingTopics: Array<{
-        id: string;
-        name: string;
-        interval: number;
-        usingTemplateId: string | null;
-        script: string;
-        brokerId: string;
-        brokerName: string;
-    }>;
+    state: SensorState;
+    subscribingTopics: SubscribingTopicDto[];
 };
