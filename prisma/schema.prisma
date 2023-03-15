@@ -30,17 +30,17 @@ model Cluster {
 }
 
 model Sensor {
-  id            String         @id @default(cuid())
+  id            String              @id @default(cuid())
   ipAddr        String
-  name          String         @db.VarChar(50)
-  kernelName    String         @db.VarChar(100)
-  kernelVersion String         @db.VarChar(50)
-  arch          String         @db.VarChar(25)
-  hostname      String         @db.VarChar(100)
-  rootUser      String         @db.VarChar(50)
+  name          String              @db.VarChar(50)
+  kernelName    String              @db.VarChar(100)
+  kernelVersion String              @db.VarChar(50)
+  arch          String              @db.VarChar(25)
+  hostname      String              @db.VarChar(100)
+  rootUser      String              @db.VarChar(50)
   remarks       String?
   // status        SensorStatus   @default(REQUESTED)
-  cluster       Cluster        @relation(fields: [clusterId], references: [id], onDelete: Cascade)
+  cluster       Cluster             @relation(fields: [clusterId], references: [id], onDelete: Cascade)
   clusterId     String
   topicConfigs  SensorTopicConfig[]
 
@@ -55,9 +55,9 @@ model KafkaBroker {
 }
 
 model KafkaTopic {
-  id            String         @id @default(cuid())
+  id            String              @id @default(cuid())
   name          String
-  broker        KafkaBroker    @relation(fields: [brokerId], references: [id])
+  broker        KafkaBroker         @relation(fields: [brokerId], references: [id])
   brokerId      String
   sensorConfigs SensorTopicConfig[]
 
@@ -79,7 +79,9 @@ model SensorTopicConfig {
 }
 
 model FilterTemplate {
-  id           String         @id @default(cuid())
+  id           String              @id @default(cuid())
+  name         String
+  remarks      String?
   script       String
   interval     Float
   SensorConfig SensorTopicConfig[]

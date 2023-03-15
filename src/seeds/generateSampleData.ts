@@ -86,6 +86,8 @@ async function generateSampleData() {
     });
     const filterTemplate = await prisma.filterTemplate.create({
         data: {
+            name: 'Sample template',
+            remarks: null,
             script: yamlScript,
             interval: 10
         }
