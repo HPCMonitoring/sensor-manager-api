@@ -1,6 +1,6 @@
 import { HandlerTag } from '@constants';
 import { usersHandler } from '@handlers';
-import { filterTemplateSchema } from '@schemas/out';
+import { filterTemplateSchema, kafkaBrokerSchema } from '@schemas/out';
 import { createPlugin } from '@utils';
 import s from 'fluent-json-schema';
 
@@ -26,6 +26,16 @@ export const userPlugin = createPlugin(
                 }
             },
             handler: usersHandler.getFilterTemplates
+        },
+        {
+            method: 'GET',
+            url: '/brokers',
+            schema: {
+                response: {
+                    200: s.array().items(kafkaBrokerSchema)
+                }
+            },
+            handler: usersHandler.getKafkaBrokers
         }
     ]
 );
