@@ -1,15 +1,15 @@
-import { HandlerTag } from '@constants';
-import { authHandler } from '@handlers';
-import { authInputSchema } from '@schemas/in';
-import { authResultSchema } from '@schemas/out';
-import { createPlugin } from '@utils';
+import { HandlerTag } from "@constants";
+import { authHandler } from "@handlers";
+import { authInputSchema } from "@schemas/in";
+import { authResultSchema } from "@schemas/out";
+import { createPlugin } from "@utils";
 
 export const authPlugin = createPlugin(
     [HandlerTag.AUTH],
     [
         {
-            method: 'POST',
-            url: '/login',
+            method: "POST",
+            url: "/login",
             schema: {
                 body: authInputSchema,
                 response: {
@@ -19,8 +19,8 @@ export const authPlugin = createPlugin(
             handler: authHandler.login
         },
         {
-            method: 'POST',
-            url: '/signup',
+            method: "POST",
+            url: "/signup",
             schema: {
                 body: authInputSchema,
                 response: {

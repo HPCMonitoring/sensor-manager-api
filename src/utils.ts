@@ -1,5 +1,5 @@
-import { HandlerTag } from '@constants';
-import { FastifyInstance, RouteOptions } from 'fastify';
+import { HandlerTag } from "@constants";
+import { FastifyInstance, RouteOptions } from "fastify";
 
 export function createPlugin(swaggerTags: HandlerTag[], routesOptions: RouteOptions[]) {
     return async function (app: FastifyInstance) {
