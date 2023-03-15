@@ -9,7 +9,7 @@ export const filterTemplateSchema = s
     .prop('script', s.string())
     .prop('interval', s.number());
 
-export type GetFilterTemplate = {
+export type FilterTemplateDto = {
     id: string;
     script: string;
     name: string;

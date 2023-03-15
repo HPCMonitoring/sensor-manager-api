@@ -6,9 +6,9 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '@configs';
 import { User } from '@prisma/client';
 import { AuthInput } from '@schemas/in';
-import { AuthOutput } from '@schemas/out';
+import { AuthResultDto } from '@schemas/out';
 
-async function login(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Result<AuthOutput> {
+async function login(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Result<AuthResultDto> {
     const user = await prisma.user.findUnique({
         select: {
             id: true,
@@ -31,7 +31,7 @@ async function login(request: FastifyRequest<{ Body: AuthInput }>, reply: Fastif
     };
 }
 
-async function signup(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Promise<AuthOutput | void> {
+async function signup(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Promise<AuthResultDto | void> {
     const hashPassword = await hash(request.body.password, SALT_ROUNDS);
     let user: User;
     try {

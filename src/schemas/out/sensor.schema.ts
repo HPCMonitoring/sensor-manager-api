@@ -3,26 +3,23 @@ import s from 'fluent-json-schema';
 
 const allSensorStates: SensorState[] = ['RUNNING', 'STOPPED', 'DISCONNECTED', 'REQUESTED'];
 
-export const getAllSensorsSchema = s
-    .array()
-    .items(
-        s
-            .object()
-            .prop('id', s.string())
-            .prop('name', s.string())
-            .prop('ipAddr', s.string())
-            .prop('remarks', s.string().raw(nullable))
-            .prop('state', s.enum(allSensorStates))
-    );
-export type GetAllSensors = Array<{
+export const sensorSummarySchema = s
+    .object()
+    .prop('id', s.string())
+    .prop('name', s.string())
+    .prop('ipAddr', s.string())
+    .prop('remarks', s.string().raw(nullable))
+    .prop('state', s.enum(allSensorStates));
+
+export type SensorSummaryDto = {
     id: string;
     name: string;
     ipAddr: string;
     remarks: string | null;
     state: SensorState;
-}>;
+};
 
-export const getSensorSchema = s
+export const sensorDetailSchema = s
     .object()
     .prop('id', s.string())
     .prop('name', s.string())
@@ -49,7 +46,7 @@ export const getSensorSchema = s
                     .prop('brokerName', s.string())
             )
     );
-export type GetSensor = {
+export type SensorDetailDto = {
     id: string;
     name: string;
     ipAddr: string;

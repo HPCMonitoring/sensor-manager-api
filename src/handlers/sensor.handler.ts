@@ -1,6 +1,6 @@
 import { SENSOR_NOT_EXISTS } from '@constants';
 import { prisma } from '@repositories';
-import { GetAllSensors, GetSensor } from '@schemas/out';
+import { GetAllSensors, SensorDetailDto } from '@schemas/out';
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<GetAllSensors> {
@@ -23,7 +23,7 @@ async function getById(
         Params: { sensorId: string };
     }>,
     reply: FastifyReply
-): Result<GetSensor> {
+): Result<SensorDetailDto> {
     const topicConfigsQuery = {
         select: {
             kafkaTopic: {

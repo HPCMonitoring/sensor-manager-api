@@ -1,8 +1,8 @@
 import s from 'fluent-json-schema';
 
-export const getUserSchema = s.object().prop('id', s.string()).prop('email', s.string());
+export const userSchema = s.object().prop('id', s.string()).prop('email', s.string());
 
-export type GetUser = {
+export type UserDto = {
     id: string;
     email: string;
 };

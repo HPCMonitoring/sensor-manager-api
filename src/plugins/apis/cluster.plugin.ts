@@ -2,7 +2,7 @@ import { HandlerTag } from '@constants';
 import { clustersHandler } from '@handlers';
 import { idSchema } from '@schemas/common';
 import { clusterInputSchema } from '@schemas/in';
-import { clusterSchema, getAllClustersSchema } from '@schemas/out';
+import { createClusterSchema, clusterSummarySchema } from '@schemas/out';
 import { createPlugin } from '@utils';
 import s from 'fluent-json-schema';
 
@@ -14,7 +14,7 @@ export const clusterPlugin = createPlugin(
             url: '',
             schema: {
                 response: {
-                    200: getAllClustersSchema
+                    200: s.array().items(clusterSummarySchema)
                 }
             },
             handler: clustersHandler.getAll
@@ -25,7 +25,7 @@ export const clusterPlugin = createPlugin(
             schema: {
                 body: clusterInputSchema,
                 response: {
-                    200: clusterSchema
+                    200: createClusterSchema
                 }
             },
             handler: clustersHandler.create
@@ -37,7 +37,7 @@ export const clusterPlugin = createPlugin(
                 params: s.object().prop('clusterId', idSchema),
                 body: clusterInputSchema,
                 response: {
-                    200: clusterSchema
+                    200: createClusterSchema
                 }
             },
             handler: clustersHandler.update
@@ -48,7 +48,7 @@ export const clusterPlugin = createPlugin(
             schema: {
                 params: s.object().prop('clusterId', idSchema),
                 response: {
-                    200: clusterSchema
+                    200: createClusterSchema
                 }
             },
             handler: clustersHandler.delete

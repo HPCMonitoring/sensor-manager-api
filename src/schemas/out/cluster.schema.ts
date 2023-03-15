@@ -1,33 +1,27 @@
 import { idSchema, nullable } from '@schemas/common';
 import s from 'fluent-json-schema';
 
-export const clusterSchema = s
+export const createClusterSchema = s
     .object()
     .prop('id', idSchema)
     .prop('name', s.string())
     .prop('remarks', s.string().raw({ nullable: true }));
 
-export type GetCluster = {
+export type CreateClusterDto = {
     id: string;
     name: string;
     remarks: string | null;
 };
 
-export const getAllClustersSchema = s
-    .array()
-    .items(
-        s
-            .object()
-            .prop('id', idSchema)
-            .prop('name', s.string())
-            .prop('remarks', s.string().raw(nullable))
-            .prop('numOfSensors', s.number())
-            .prop('numOfActiveSensors', s.number())
-    );
+export const clusterSummarySchema = s
+    .object()
+    .prop('id', idSchema)
+    .prop('name', s.string())
+    .prop('remarks', s.string().raw(nullable))
+    .prop('numOfSensors', s.number())
+    .prop('numOfActiveSensors', s.number());
 
-export type GetAllClusters = Array<
-    GetCluster & {
-        numOfSensors: number;
-        numOfActiveSensors: number;
-    }
->;
+export type ClusterSummaryDto = CreateClusterDto & {
+    numOfSensors: number;
+    numOfActiveSensors: number;
+};
