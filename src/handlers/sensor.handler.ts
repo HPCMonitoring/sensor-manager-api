@@ -1,7 +1,7 @@
-import { SENSOR_NOT_EXISTS } from "@constants";
-import { prisma } from "@repositories";
-import { GetAllSensors, GetSensor } from "@schemas/out";
-import { FastifyReply, FastifyRequest } from "fastify";
+import { SENSOR_NOT_EXISTS } from '@constants';
+import { prisma } from '@repositories';
+import { GetAllSensors, GetSensor } from '@schemas/out';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<GetAllSensors> {
     const sensors = await prisma.sensor.findMany({
@@ -15,7 +15,7 @@ async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId
             clusterId: request.query.clusterId
         }
     });
-    return sensors.map((sensor) => ({ ...sensor, state: "RUNNING" }));
+    return sensors.map((sensor) => ({ ...sensor, state: 'RUNNING' }));
 }
 
 async function getById(

@@ -1,18 +1,18 @@
-import { idSchema, nullable } from "@schemas/common";
-import s from "fluent-json-schema";
+import { idSchema, nullable } from '@schemas/common';
+import s from 'fluent-json-schema';
 
-const allSensorStates: SensorState[] = ["RUNNING", "STOPPED", "DISCONNECTED", "REQUESTED"];
+const allSensorStates: SensorState[] = ['RUNNING', 'STOPPED', 'DISCONNECTED', 'REQUESTED'];
 
 export const getAllSensorsSchema = s
     .array()
     .items(
         s
             .object()
-            .prop("id", s.string())
-            .prop("name", s.string())
-            .prop("ipAddr", s.string())
-            .prop("remarks", s.string().raw(nullable))
-            .prop("state", s.enum(allSensorStates))
+            .prop('id', s.string())
+            .prop('name', s.string())
+            .prop('ipAddr', s.string())
+            .prop('remarks', s.string().raw(nullable))
+            .prop('state', s.enum(allSensorStates))
     );
 export type GetAllSensors = Array<{
     id: string;
@@ -24,29 +24,29 @@ export type GetAllSensors = Array<{
 
 export const getSensorSchema = s
     .object()
-    .prop("id", s.string())
-    .prop("name", s.string())
-    .prop("ipAddr", s.string())
-    .prop("remarks", s.string().raw(nullable))
-    .prop("kernelName", s.string())
-    .prop("kernelVersion", s.string())
-    .prop("arch", s.string())
-    .prop("hostname", s.string())
-    .prop("rootUser", s.string())
+    .prop('id', s.string())
+    .prop('name', s.string())
+    .prop('ipAddr', s.string())
+    .prop('remarks', s.string().raw(nullable))
+    .prop('kernelName', s.string())
+    .prop('kernelVersion', s.string())
+    .prop('arch', s.string())
+    .prop('hostname', s.string())
+    .prop('rootUser', s.string())
     .prop(
-        "subscribingTopics",
+        'subscribingTopics',
         s
             .array()
             .items(
                 s
                     .object()
-                    .prop("id", idSchema)
-                    .prop("name", s.string())
-                    .prop("interval", s.number())
-                    .prop("usingTemplateId", s.string().raw(nullable))
-                    .prop("script", s.string())
-                    .prop("brokerId", s.string())
-                    .prop("brokerName", s.string())
+                    .prop('id', idSchema)
+                    .prop('name', s.string())
+                    .prop('interval', s.number())
+                    .prop('usingTemplateId', s.string().raw(nullable))
+                    .prop('script', s.string())
+                    .prop('brokerId', s.string())
+                    .prop('brokerName', s.string())
             )
     );
 export type GetSensor = {

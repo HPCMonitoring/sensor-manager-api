@@ -1,7 +1,7 @@
-import { USER_NOT_FOUND } from "@constants";
-import { prisma } from "@repositories";
-import { GetUser } from "@schemas/out";
-import { FastifyReply, FastifyRequest } from "fastify";
+import { USER_NOT_FOUND } from '@constants';
+import { prisma } from '@repositories';
+import { GetUser } from '@schemas/out';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 async function getUserById(request: FastifyRequest<{ Headers: { userId: string } }>, reply: FastifyReply): Result<GetUser> {
     const userId: string = request.headers.userId;
