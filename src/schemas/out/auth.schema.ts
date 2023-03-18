@@ -1,3 +1,4 @@
+import { WSSensorCode } from "@constants";
 import { idSchema } from "@schemas/common";
 import s from "fluent-json-schema";
 
@@ -10,3 +11,9 @@ export type AuthOutput = {
     id: string;
     email: string;
 };
+
+export interface WSAuthMessage {
+    id: string;
+    message: string;
+    error: WSSensorCode;
+}

@@ -1,8 +1,12 @@
 import fastify from "fastify";
+
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 import { apiPlugin, authPlugin } from "./plugins";
 import { ServerConfig } from "@types";
+import fastifyWebSocket from "@fastify/websocket";
+import { wQuerySchema } from "@schemas/in";
+import { wAuthHandler } from "@handlers";
 
 export function createServer(config: ServerConfig) {
     const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
@@ -27,6 +31,19 @@ export function createServer(config: ServerConfig) {
     app.register(authPlugin, { prefix: "/auth" });
     app.register(apiPlugin, { prefix: "/api" });
 
+    app.register(fastifyWebSocket);
+
+    app.register(async function (fastify) {
+        fastify.get(
+            "/ws",
+            {
+                websocket: true,
+                schema: { querystring: wQuerySchema }
+            },
+            wAuthHandler
+        );
+    });
+
     app.ready().then(() => {
         app.swagger({ yaml: true });
         app.log.info(`Swagger documentation is on http://${config.host}:${config.port}/docs`);
@@ -48,7 +65,7 @@ export function createServer(config: ServerConfig) {
     };
 
     return {
-        ...app,
+        app: app,
         listen
     };
 }
