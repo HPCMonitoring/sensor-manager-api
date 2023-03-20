@@ -38,7 +38,7 @@ async function generateSampleData() {
         data: [
             {
                 name: "Sensor 1",
-                remarks: "Sample sensors",
+                remarks: "Some notes ...",
                 ipAddr: "14.255.37.12",
                 clusterId: cluster.id,
                 kernelName: "Linux",
@@ -49,7 +49,7 @@ async function generateSampleData() {
             },
             {
                 name: "Sensor 2",
-                remarks: "Sample sensors",
+                remarks: "Hello, this is sensor 2",
                 ipAddr: "14.255.37.145",
                 clusterId: cluster.id,
                 kernelName: "Linux",
@@ -60,7 +60,7 @@ async function generateSampleData() {
             },
             {
                 name: "Sensor 3",
-                remarks: "Sample sensors",
+                remarks: null,
                 ipAddr: "14.255.94.235",
                 clusterId: cluster.id,
                 kernelName: "Linux",

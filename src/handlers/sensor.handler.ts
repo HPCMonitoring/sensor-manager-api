@@ -37,6 +37,7 @@ async function getById(
             rootUser: true,
             topicConfigs: {
                 select: {
+                    id: true,
                     kafkaTopic: {
                         select: {
                             id: true,
@@ -70,6 +71,7 @@ async function getById(
         rootUser: sensor.rootUser,
         state: "RUNNING",
         subscribingTopics: sensor.topicConfigs.map((topicConfig) => ({
+            key: topicConfig.id,
             id: topicConfig.kafkaTopic.id,
             name: topicConfig.kafkaTopic.name,
             interval: topicConfig.interval,

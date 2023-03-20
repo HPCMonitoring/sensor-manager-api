@@ -7,7 +7,7 @@ export const createClusterSchema = s
     .prop("name", s.string())
     .prop("remarks", s.string().raw({ nullable: true }));
 
-export type CreateClusterDto = {
+export type ClusterMutationResultDto = {
     id: string;
     name: string;
     remarks: string | null;
@@ -21,7 +21,7 @@ export const clusterSummarySchema = s
     .prop("numOfSensors", s.number())
     .prop("numOfActiveSensors", s.number());
 
-export type ClusterSummaryDto = CreateClusterDto & {
+export type ClusterSummaryDto = ClusterMutationResultDto & {
     numOfSensors: number;
     numOfActiveSensors: number;
 };

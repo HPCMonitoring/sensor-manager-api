@@ -22,6 +22,7 @@ export type SensorSummaryDto = {
 const subscribingTopicSchema = s
     .object()
     .prop("id", idSchema)
+    .prop("key", idSchema.description("ID of configuration"))
     .prop("name", s.string())
     .prop("interval", s.number())
     .prop("usingTemplate", s.object().raw(nullable).prop("id", idSchema).prop("name", s.string()))
@@ -29,6 +30,7 @@ const subscribingTopicSchema = s
     .prop("broker", s.object().prop("id", idSchema).prop("name", s.string()).prop("url", s.string()));
 
 type SubscribingTopicDto = {
+    key: string;
     id: string;
     name: string;
     interval: number;
