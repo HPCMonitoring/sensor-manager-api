@@ -1,1 +1,1 @@
-export type Environment = "development" | "staging" | "production" | "test";
+type Environment = "development" | "staging" | "production" | "test";
