@@ -5,3 +5,4 @@
 export * from "./auth.schema";
 export * from "./cluster.schema";
 export * from "./wSensor.schema.";
+export * from "./sensor.schema";

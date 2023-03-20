@@ -1,1 +1,1 @@
-export type Result<T> = Promise<T | void>;
+type Result<T> = Promise<T | void>;

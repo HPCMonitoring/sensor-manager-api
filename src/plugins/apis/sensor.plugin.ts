@@ -1,7 +1,8 @@
 import { HandlerTag } from "@constants";
 import { sensorHandler } from "@handlers";
 import { idSchema } from "@schemas/common";
-import { getAllSensorsSchema, getSensorSchema } from "@schemas/out";
+import { updateSensorSchema } from "@schemas/in";
+import { sensorSummarySchema, sensorDetailSchema } from "@schemas/out";
 import { createPlugin } from "@utils";
 import s from "fluent-json-schema";
 
@@ -12,9 +13,9 @@ export const sensorPlugin = createPlugin(
             method: "GET",
             url: "",
             schema: {
-                querystring: s.object().prop("clusterId", idSchema),
+                querystring: s.object().prop("clusterId", idSchema.required()),
                 response: {
-                    200: getAllSensorsSchema
+                    200: s.array().items(sensorSummarySchema)
                 }
             },
             handler: sensorHandler.getByClusterId
@@ -23,12 +24,35 @@ export const sensorPlugin = createPlugin(
             method: "GET",
             url: "/:sensorId",
             schema: {
-                params: s.object().prop("sensorId", idSchema),
+                params: s.object().prop("sensorId", idSchema.required()),
                 response: {
-                    200: getSensorSchema
+                    200: sensorDetailSchema
                 }
             },
             handler: sensorHandler.getById
+        },
+        {
+            method: "PUT",
+            url: "/:sensorId",
+            schema: {
+                params: s.object().prop("sensorId", idSchema.required()),
+                body: updateSensorSchema,
+                response: {
+                    200: idSchema
+                }
+            },
+            handler: sensorHandler.update
+        },
+        {
+            method: "DELETE",
+            url: "/:sensorId",
+            schema: {
+                params: s.object().prop("sensorId", idSchema.required()),
+                response: {
+                    200: idSchema
+                }
+            },
+            handler: sensorHandler.delete
         }
     ]
 );

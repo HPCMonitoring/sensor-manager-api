@@ -38,7 +38,7 @@ async function generateSampleData() {
         data: [
             {
                 name: "Sensor 1",
-                remarks: "Sample sensors",
+                remarks: "Some notes ...",
                 ipAddr: "14.255.37.12",
                 clusterId: cluster.id,
                 kernelName: "Linux",
@@ -49,7 +49,7 @@ async function generateSampleData() {
             },
             {
                 name: "Sensor 2",
-                remarks: "Sample sensors",
+                remarks: "Hello, this is sensor 2",
                 ipAddr: "14.255.37.145",
                 clusterId: cluster.id,
                 kernelName: "Linux",
@@ -60,7 +60,7 @@ async function generateSampleData() {
             },
             {
                 name: "Sensor 3",
-                remarks: "Sample sensors",
+                remarks: null,
                 ipAddr: "14.255.94.235",
                 clusterId: cluster.id,
                 kernelName: "Linux",
@@ -78,6 +78,26 @@ async function generateSampleData() {
             name: "Localhost"
         }
     });
+
+    await prisma.kafkaBroker.create({
+        data: {
+            url: "https://hpcc.hcmut.edu.vn",
+            name: "HPCC",
+            topics: {
+                createMany: {
+                    data: [
+                        {
+                            name: "ram-usage"
+                        },
+                        {
+                            name: "cpu-usage"
+                        }
+                    ]
+                }
+            }
+        }
+    });
+
     const kafkaTopic = await prisma.kafkaTopic.create({
         data: {
             name: "hello-world-topic",
@@ -86,6 +106,8 @@ async function generateSampleData() {
     });
     const filterTemplate = await prisma.filterTemplate.create({
         data: {
+            name: "Sample template",
+            remarks: null,
             script: yamlScript,
             interval: 10
         }

@@ -3,8 +3,6 @@ import fastify from "fastify";
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 import { apiPlugin, authPlugin } from "./plugins";
-import { ServerConfig } from "@types";
-import fastifyWebSocket from "@fastify/websocket";
 import { wQuerySchema } from "@schemas/in";
 import { wAuthHandler } from "@handlers";
 
@@ -31,7 +29,7 @@ export function createServer(config: ServerConfig) {
     app.register(authPlugin, { prefix: "/auth" });
     app.register(apiPlugin, { prefix: "/api" });
 
-    app.register(fastifyWebSocket);
+    app.register(import("@fastify/websocket"));
 
     app.register(async function (fastify) {
         fastify.get(
