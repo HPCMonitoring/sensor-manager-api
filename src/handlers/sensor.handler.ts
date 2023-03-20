@@ -1,5 +1,6 @@
 import { SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
+import { UpdateSensorDto } from "@schemas/in";
 import { SensorDetailDto, SensorSummaryDto } from "@schemas/out";
 import { FastifyReply, FastifyRequest } from "fastify";
 
@@ -70,7 +71,7 @@ async function getById(
         hostname: sensor.hostname,
         rootUser: sensor.rootUser,
         state: "RUNNING",
-        subscribingTopics: sensor.topicConfigs.map((topicConfig) => ({
+        subscribeTopics: sensor.topicConfigs.map((topicConfig) => ({
             key: topicConfig.id,
             id: topicConfig.kafkaTopic.id,
             name: topicConfig.kafkaTopic.name,
@@ -82,7 +83,48 @@ async function getById(
     };
 }
 
+async function update(
+    request: FastifyRequest<{
+        Params: { sensorId: string };
+        Body: UpdateSensorDto;
+    }>
+): Result<string> {
+    const payload = request.body;
+    const sensorId = request.params.sensorId;
+    await prisma.$transaction([
+        prisma.sensorTopicConfig.deleteMany({
+            where: { sensorId }
+        }),
+        prisma.sensor.update({
+            data: {
+                name: payload.name,
+                remarks: payload.remarks,
+                topicConfigs: {
+                    createMany: {
+                        data: payload.subscribeTopics.map((item) => ({
+                            interval: item.interval,
+                            script: item.script,
+                            filterTemplateId: item.usingTemplateId,
+                            kafkaTopicId: item.id
+                        }))
+                    }
+                }
+            },
+            where: { id: sensorId }
+        })
+    ]);
+    return sensorId;
+}
+
+async function deleteSensor(request: FastifyRequest<{ Params: { sensorId: string } }>): Result<string> {
+    const sensorId = request.params.sensorId;
+    await prisma.sensor.delete({ where: { id: sensorId } });
+    return sensorId;
+}
+
 export const sensorHandler = {
     getByClusterId,
-    getById
+    getById,
+    update,
+    delete: deleteSensor
 };

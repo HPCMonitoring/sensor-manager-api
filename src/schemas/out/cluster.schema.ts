@@ -1,7 +1,7 @@
 import { idSchema, nullable } from "@schemas/common";
 import s from "fluent-json-schema";
 
-export const createClusterSchema = s
+export const clusterMutationResultSchema = s
     .object()
     .prop("id", idSchema)
     .prop("name", s.string())

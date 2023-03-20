@@ -4,3 +4,4 @@
 
 export * from "./auth.schema";
 export * from "./cluster.schema";
+export * from "./sensor.schema";

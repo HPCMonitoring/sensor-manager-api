@@ -78,6 +78,26 @@ async function generateSampleData() {
             name: "Localhost"
         }
     });
+
+    await prisma.kafkaBroker.create({
+        data: {
+            url: "https://hpcc.hcmut.edu.vn",
+            name: "HPCC",
+            topics: {
+                createMany: {
+                    data: [
+                        {
+                            name: "ram-usage"
+                        },
+                        {
+                            name: "cpu-usage"
+                        }
+                    ]
+                }
+            }
+        }
+    });
+
     const kafkaTopic = await prisma.kafkaTopic.create({
         data: {
             name: "hello-world-topic",

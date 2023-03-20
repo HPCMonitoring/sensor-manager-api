@@ -19,7 +19,7 @@ export type SensorSummaryDto = {
     state: SensorState;
 };
 
-const subscribingTopicSchema = s
+const subscribeTopicSchema = s
     .object()
     .prop("id", idSchema)
     .prop("key", idSchema.description("ID of configuration"))
@@ -29,7 +29,7 @@ const subscribingTopicSchema = s
     .prop("script", s.string())
     .prop("broker", s.object().prop("id", idSchema).prop("name", s.string()).prop("url", s.string()));
 
-type SubscribingTopicDto = {
+type SubscribeTopicDto = {
     key: string;
     id: string;
     name: string;
@@ -58,7 +58,7 @@ export const sensorDetailSchema = s
     .prop("hostname", s.string())
     .prop("rootUser", s.string())
     .prop("state", s.enum(allSensorStates))
-    .prop("subscribingTopics", s.array().items(subscribingTopicSchema));
+    .prop("subscribeTopics", s.array().items(subscribeTopicSchema));
 
 export type SensorDetailDto = {
     id: string;
@@ -71,5 +71,5 @@ export type SensorDetailDto = {
     hostname: string;
     rootUser: string;
     state: SensorState;
-    subscribingTopics: SubscribingTopicDto[];
+    subscribeTopics: SubscribeTopicDto[];
 };

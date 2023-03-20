@@ -1,8 +1,8 @@
 import { HandlerTag } from "@constants";
 import { clustersHandler } from "@handlers";
 import { idSchema } from "@schemas/common";
-import { clusterInputSchema } from "@schemas/in";
-import { createClusterSchema, clusterSummarySchema } from "@schemas/out";
+import { clusterMutationSchema } from "@schemas/in";
+import { clusterMutationResultSchema, clusterSummarySchema } from "@schemas/out";
 import { createPlugin } from "@utils";
 import s from "fluent-json-schema";
 
@@ -23,9 +23,9 @@ export const clusterPlugin = createPlugin(
             method: "POST",
             url: "",
             schema: {
-                body: clusterInputSchema,
+                body: clusterMutationSchema,
                 response: {
-                    200: createClusterSchema
+                    200: clusterMutationResultSchema
                 }
             },
             handler: clustersHandler.create
@@ -34,10 +34,10 @@ export const clusterPlugin = createPlugin(
             method: "PUT",
             url: "/:clusterId",
             schema: {
-                params: s.object().prop("clusterId", idSchema),
-                body: clusterInputSchema,
+                params: s.object().prop("clusterId", idSchema.required()),
+                body: clusterMutationSchema,
                 response: {
-                    200: createClusterSchema
+                    200: clusterMutationResultSchema
                 }
             },
             handler: clustersHandler.update
@@ -46,9 +46,9 @@ export const clusterPlugin = createPlugin(
             method: "DELETE",
             url: "/:clusterId",
             schema: {
-                params: s.object().prop("clusterId", idSchema),
+                params: s.object().prop("clusterId", idSchema.required()),
                 response: {
-                    200: createClusterSchema
+                    200: clusterMutationResultSchema
                 }
             },
             handler: clustersHandler.delete
