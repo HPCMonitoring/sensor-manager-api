@@ -5,7 +5,7 @@ export const clusterMutationResultSchema = s
     .object()
     .prop("id", idSchema)
     .prop("name", s.string())
-    .prop("remarks", s.string().raw({ nullable: true }));
+    .prop("remarks", s.string().raw(nullable));
 
 export type ClusterMutationResultDto = {
     id: string;

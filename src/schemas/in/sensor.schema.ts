@@ -1,11 +1,11 @@
 import { ID_LENGTH, MIN_INTERVAL } from "@constants";
-import { idSchema } from "@schemas/common";
+import { idSchema, nullable } from "@schemas/common";
 import s from "fluent-json-schema";
 
 const subscribeTopic = s
     .object()
     .prop("id", idSchema.required())
-    .prop("usingTemplateId", s.string().minLength(ID_LENGTH).maxLength(ID_LENGTH).raw({ nullable: true }))
+    .prop("usingTemplateId", s.string().minLength(ID_LENGTH).maxLength(ID_LENGTH).raw(nullable))
     .prop("script", s.string().required())
     .prop("interval", s.number().required().minimum(MIN_INTERVAL));
 
@@ -19,7 +19,7 @@ type SubscribeTopicDto = {
 export const updateSensorSchema = s
     .object()
     .prop("name", s.string().required())
-    .prop("remarks", s.string().raw({ nullable: true }))
+    .prop("remarks", s.string().raw(nullable))
     .prop("subscribeTopics", s.array().required().items(subscribeTopic));
 
 export type UpdateSensorDto = {

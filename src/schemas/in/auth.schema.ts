@@ -6,7 +6,7 @@ export const authInputSchema = s
     .prop("email", s.string().required().minLength(MIN_EMAIL_LENGTH))
     .prop("password", s.string().required().minLength(MIN_PASSWORD_LENGTH));
 
-export interface AuthInput {
+export type AuthInputDto = {
     email: string;
     password: string;
-}
+};
