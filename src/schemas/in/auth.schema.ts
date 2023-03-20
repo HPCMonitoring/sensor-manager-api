@@ -10,3 +10,14 @@ export type AuthInputDto = {
     email: string;
     password: string;
 };
+
+export const wQuerySchema = s
+    .object()
+    .prop("cluster", s.string().required().examples(["BK HPC Laboratory"]))
+    .prop("name", s.string().required().examples(["Sensor 1"]));
+
+export type WQueryString = {
+    id: string;
+    cluster: string;
+    name: string;
+};

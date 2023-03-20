@@ -43,6 +43,7 @@
             "@utils": ["src/utils"],
             "@middlewares": ["src/middlewares"],
             "@middlewares/*": ["src/middlewares/*"],
+            "@models": ["src/models"],
         }
     },
     "include": ["src", "**/*.js", "**/*.ts"],
