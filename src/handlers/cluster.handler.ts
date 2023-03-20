@@ -1,10 +1,10 @@
-import { CLUSTER_NOT_EXISTS, DUPLICATED_CLUSTER } from '@constants';
-import { prisma } from '@repositories';
-import { ClusterInput } from '@schemas/in';
-import { GetCluster, GetAllClusters } from '@schemas/out';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { CLUSTER_NOT_EXISTS, DUPLICATED_CLUSTER } from "@constants";
+import { prisma } from "@repositories";
+import { ClusterMutationDto } from "@schemas/in";
+import { ClusterSummaryDto, ClusterMutationResultDto } from "@schemas/out";
+import { FastifyReply, FastifyRequest } from "fastify";
 
-async function getAll(): Result<GetAllClusters> {
+async function getAll(): Result<ClusterSummaryDto[]> {
     const clusters = await prisma.cluster.findMany({
         select: {
             id: true,
@@ -27,7 +27,7 @@ async function getAll(): Result<GetAllClusters> {
     }));
 }
 
-async function create(request: FastifyRequest<{ Body: ClusterInput }>, reply: FastifyReply): Result<GetCluster> {
+async function create(request: FastifyRequest<{ Body: ClusterMutationDto }>, reply: FastifyReply): Result<ClusterMutationResultDto> {
     try {
         const cluster = prisma.cluster.create({
             data: request.body
@@ -40,11 +40,11 @@ async function create(request: FastifyRequest<{ Body: ClusterInput }>, reply: Fa
 
 async function update(
     request: FastifyRequest<{
-        Body: ClusterInput;
+        Body: ClusterMutationDto;
         Params: { clusterId: string };
     }>,
     reply: FastifyReply
-): Result<GetCluster> {
+): Result<ClusterMutationResultDto> {
     try {
         const cluster = await prisma.cluster.update({
             data: request.body,
@@ -61,7 +61,7 @@ async function deleteCluster(
         Params: { clusterId: string };
     }>,
     reply: FastifyReply
-): Result<GetCluster> {
+): Result<ClusterMutationResultDto> {
     try {
         return prisma.cluster.delete({
             where: {

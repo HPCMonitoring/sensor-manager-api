@@ -1,6 +1,6 @@
 export enum HandlerTag {
-    USER = 'User',
-    AUTH = 'Auth',
-    CLUSTER = 'Cluster',
-    SENSOR = 'Sensor'
+    USER = "User",
+    AUTH = "Auth",
+    CLUSTER = "Cluster",
+    SENSOR = "Sensor"
 }

@@ -1,9 +1,9 @@
-import { USER_NOT_FOUND } from '@constants';
-import { prisma } from '@repositories';
-import { GetUser } from '@schemas/out';
-import { FastifyReply, FastifyRequest } from 'fastify';
+import { USER_NOT_FOUND } from "@constants";
+import { prisma } from "@repositories";
+import { FilterTemplateDto, KafkaBrokerDto, UserDto } from "@schemas/out";
+import { FastifyReply, FastifyRequest } from "fastify";
 
-async function getUserById(request: FastifyRequest<{ Headers: { userId: string } }>, reply: FastifyReply): Result<GetUser> {
+async function getUserById(request: FastifyRequest<{ Headers: { userId: string } }>, reply: FastifyReply): Result<UserDto> {
     const userId: string = request.headers.userId;
     const user = await prisma.user.findUnique({
         select: {
@@ -16,6 +16,28 @@ async function getUserById(request: FastifyRequest<{ Headers: { userId: string }
     return user;
 }
 
+async function getFilterTemplates(): Result<Array<FilterTemplateDto>> {
+    return prisma.filterTemplate.findMany();
+}
+
+async function getKafkaBrokers(): Result<KafkaBrokerDto[]> {
+    return prisma.kafkaBroker.findMany({
+        select: {
+            id: true,
+            name: true,
+            url: true,
+            topics: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            }
+        }
+    });
+}
+
 export const usersHandler = {
-    getUserById
+    getUserById,
+    getFilterTemplates,
+    getKafkaBrokers
 };

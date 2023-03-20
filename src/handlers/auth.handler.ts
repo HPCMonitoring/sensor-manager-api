@@ -1,14 +1,14 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { compare, hash } from 'bcrypt';
-import { prisma } from '@repositories';
-import { cookieOptions, DUPLICATED_EMAIL, LOGIN_FAIL, SALT_ROUNDS, USER_NOT_FOUND } from '@constants';
-import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '@configs';
-import { User } from '@prisma/client';
-import { AuthInput } from '@schemas/in';
-import { AuthOutput } from '@schemas/out';
+import { FastifyReply, FastifyRequest } from "fastify";
+import { compare, hash } from "bcrypt";
+import { prisma } from "@repositories";
+import { cookieOptions, DUPLICATED_EMAIL, LOGIN_FAIL, SALT_ROUNDS, USER_NOT_FOUND } from "@constants";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "@configs";
+import { User } from "@prisma/client";
+import { AuthInputDto } from "@schemas/in";
+import { AuthResultDto } from "@schemas/out";
 
-async function login(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Result<AuthOutput> {
+async function login(request: FastifyRequest<{ Body: AuthInputDto }>, reply: FastifyReply): Result<AuthResultDto> {
     const user = await prisma.user.findUnique({
         select: {
             id: true,
@@ -23,7 +23,7 @@ async function login(request: FastifyRequest<{ Body: AuthInput }>, reply: Fastif
     if (!correctPassword) return reply.badRequest(LOGIN_FAIL);
 
     const userToken = jwt.sign({ userId: user.id }, JWT_SECRET);
-    reply.setCookie('token', userToken, cookieOptions);
+    reply.setCookie("token", userToken, cookieOptions);
 
     return {
         id: user.id,
@@ -31,7 +31,7 @@ async function login(request: FastifyRequest<{ Body: AuthInput }>, reply: Fastif
     };
 }
 
-async function signup(request: FastifyRequest<{ Body: AuthInput }>, reply: FastifyReply): Promise<AuthOutput | void> {
+async function signup(request: FastifyRequest<{ Body: AuthInputDto }>, reply: FastifyReply): Promise<AuthResultDto | void> {
     const hashPassword = await hash(request.body.password, SALT_ROUNDS);
     let user: User;
     try {
@@ -46,7 +46,7 @@ async function signup(request: FastifyRequest<{ Body: AuthInput }>, reply: Fasti
     }
 
     const userToken = jwt.sign({ userId: user.id }, JWT_SECRET);
-    reply.setCookie('token', userToken, cookieOptions);
+    reply.setCookie("token", userToken, cookieOptions);
 
     return {
         id: user.id,

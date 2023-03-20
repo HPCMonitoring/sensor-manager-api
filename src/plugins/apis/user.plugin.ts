@@ -1,20 +1,41 @@
-import { HandlerTag } from '@constants';
-import { usersHandler } from '@handlers';
-import { getUserSchema } from '@schemas/out';
-import { createPlugin } from '@utils';
+import { HandlerTag } from "@constants";
+import { usersHandler } from "@handlers";
+import { filterTemplateSchema, kafkaBrokerSchema } from "@schemas/out";
+import { createPlugin } from "@utils";
+import s from "fluent-json-schema";
 
 export const userPlugin = createPlugin(
     [HandlerTag.USER],
     [
+        // {
+        //     method: 'GET',
+        //     url: '',
+        //     schema: {
+        //         response: {
+        //             200: getUserSchema
+        //         }
+        //     },
+        //     handler: usersHandler.getUserById
+        // },
         {
-            method: 'GET',
-            url: '',
+            method: "GET",
+            url: "/filter-templates",
             schema: {
                 response: {
-                    200: getUserSchema
+                    200: s.array().items(filterTemplateSchema)
                 }
             },
-            handler: usersHandler.getUserById
+            handler: usersHandler.getFilterTemplates
+        },
+        {
+            method: "GET",
+            url: "/brokers",
+            schema: {
+                response: {
+                    200: s.array().items(kafkaBrokerSchema)
+                }
+            },
+            handler: usersHandler.getKafkaBrokers
         }
     ]
 );

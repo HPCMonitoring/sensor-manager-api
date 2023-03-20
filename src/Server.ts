@@ -1,30 +1,30 @@
-import fastify from 'fastify';
-import type { FastifyCookieOptions } from '@fastify/cookie';
-import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from '@configs';
-import { apiPlugin, authPlugin } from './plugins';
+import fastify from "fastify";
+import type { FastifyCookieOptions } from "@fastify/cookie";
+import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
+import { apiPlugin, authPlugin } from "./plugins";
 
 export function createServer(config: ServerConfig) {
     const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
 
-    app.register(import('@fastify/sensible'));
-    app.register(import('@fastify/helmet'));
-    app.register(import('@fastify/cors'), {
+    app.register(import("@fastify/sensible"));
+    app.register(import("@fastify/helmet"));
+    app.register(import("@fastify/cors"), {
         origin: CORS_WHITE_LIST
     });
 
-    app.register(import('@fastify/cookie'), {
+    app.register(import("@fastify/cookie"), {
         secret: COOKIE_SECRET, // for cookies signature
-        hook: 'onRequest'
+        hook: "onRequest"
     } as FastifyCookieOptions);
 
     // Swagger on production will be turned off in the future
-    if (ENVIRONMENT === 'development' || ENVIRONMENT === 'staging' || ENVIRONMENT === 'production') {
-        app.register(import('@fastify/swagger'), swaggerConfig);
-        app.register(import('@fastify/swagger-ui'), swaggerUIConfig);
+    if (ENVIRONMENT === "development" || ENVIRONMENT === "staging" || ENVIRONMENT === "production") {
+        app.register(import("@fastify/swagger"), swaggerConfig);
+        app.register(import("@fastify/swagger-ui"), swaggerUIConfig);
     }
 
-    app.register(authPlugin, { prefix: '/auth' });
-    app.register(apiPlugin, { prefix: '/api' });
+    app.register(authPlugin, { prefix: "/auth" });
+    app.register(apiPlugin, { prefix: "/api" });
 
     app.ready().then(() => {
         app.swagger({ yaml: true });

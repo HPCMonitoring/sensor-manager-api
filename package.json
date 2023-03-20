@@ -12,6 +12,7 @@
     "test": "cross-env NODE_ENV=test jest --passWithNoTests",
     "seed": "ts-node src/seeds/generateSampleData.ts",
     "db:migrate": "npx prisma migrate dev",
+    "db:reset": "npx prisma migrate reset --force",
     "db:deploy": "npx prisma migrate deploy",
     "db:generate": "npx prisma generate",
     "db:studio": "npx prisma studio",
