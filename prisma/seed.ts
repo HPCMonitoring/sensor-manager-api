@@ -1,6 +1,8 @@
-import { prisma } from "../prisma";
 import { hashSync } from "bcrypt";
-import { SALT_ROUNDS } from "../constants/crypt";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+const SALT_ROUNDS = 10;
 
 const user = {
     email: "npvinh0507@gmail.com",
