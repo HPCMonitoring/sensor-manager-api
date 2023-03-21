@@ -84,7 +84,11 @@ jobs:
             if [[ "${{ vars.RESET_DB }}" == "true" ]];
             then
               echo "Reset database !"
+              echo "Waiting for service ready ... "
+              until [ "`docker inspect -f {{.State.Running}} hpcmonitoring_sensor-manager-api`"=="true" ]; do
+                sleep 0.5;
+              done;
               docker exec -it hpcmonitoring_sensor-manager-api yarn db:reset
-            fi
+            fi;
             docker logout ${{ env.REGISTRY }}
             
