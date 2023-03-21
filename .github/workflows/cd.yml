@@ -78,7 +78,7 @@ jobs:
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
             
-            # curl https://raw.githubusercontent.com/HPCMonitoring/sensor-manager-api/master/docker-compose.yml -o docker-compose.yml
+            curl https://raw.githubusercontent.com/HPCMonitoring/sensor-manager-api/master/docker-compose.yml -o docker-compose.yml
             docker-compose pull sensor-manager-api
             docker-compose down --volumes --remove-orphans && docker-compose up -d
             if [[ "${{ vars.RESET_DB }}" == "true" ]];
@@ -86,7 +86,7 @@ jobs:
               echo "Reset database !"
               echo "Waiting for service ready ... "
               sleep 5;
-              docker exec -it hpcmonitoring_sensor-manager-api yarn db:reset
+              docker exec hpcmonitoring_sensor-manager-api yarn db:reset
             fi;
             docker logout ${{ env.REGISTRY }}
             
