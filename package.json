@@ -10,7 +10,6 @@
     "start": "yarn barrels && cross-env NODE_ENV=development tsnd --ignore-watch node_modules --respawn --transpile-only --max-old-space-size=2048 -r tsconfig-paths/register src/index.ts",
     "start:prod": "cross-env NODE_ENV=staging node dist/index.js",
     "test": "cross-env NODE_ENV=test jest --passWithNoTests",
-    "seed": "ts-node src/seeds/generateSampleData.ts",
     "db:migrate": "npx prisma migrate dev",
     "db:reset": "npx prisma migrate reset --force",
     "db:deploy": "npx prisma migrate deploy",
@@ -66,10 +65,8 @@
     "tsconfig-paths": "^4.1.2",
     "typescript": "^4.9.4"
   },
-  "tsed": {
-    "packageManager": "yarn",
-    "convention": "default",
-    "architecture": "default"
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "config": {
     "commitizen": {
