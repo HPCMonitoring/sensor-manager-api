@@ -85,7 +85,7 @@ jobs:
             then
               echo "Reset database !"
               echo "Waiting for service ready ... "
-              sleep 5;
+              sleep 10;
               docker exec hpcmonitoring_sensor-manager-api yarn db:reset
             fi;
             docker logout ${{ env.REGISTRY }}
