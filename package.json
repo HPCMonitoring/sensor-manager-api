@@ -19,11 +19,10 @@
     "lint:fix": "eslint '**/*.{ts,js}' --fix",
     "format": "prettier '**/*.{ts,js,json}' --write",
     "prepare": "is-ci || husky install",
-    "bootstrap": "yarn start:docker && yarn && yarn db:migrate",
+    "bootstrap": "yarn start:docker && yarn && yarn db:migrate && prisma db seed",
     "start:docker": "docker-compose -f docker-compose.dev.yml up -d",
     "clean:docker": "docker-compose -f docker-compose.dev.yml down --volumes --remove-orphans",
-    "clean:git": "git branch --merged >/tmp/merged-branches && nano /tmp/merged-branches && xargs git branch -D </tmp/merged-branches && git fetch --prune --all",
-    "refresh": "yarn clean:docker && yarn bootstrap"
+    "clean:git": "git branch --merged >/tmp/merged-branches && nano /tmp/merged-branches && xargs git branch -D </tmp/merged-branches && git fetch --prune --all"
   },
   "dependencies": {
     "@fastify/cookie": "^8.3.0",

@@ -12,5 +12,5 @@
         "emitDeclarationOnly": false,
         "inlineSources": true
     },
-    "exclude": ["**/*.spec.ts", "src/seeds", "**/*.test.ts", "**/*.config.js", "node_modules", "dist", "coverage"]
+    "exclude": ["**/*.spec.ts", "prisma", "**/*.test.ts", "**/*.config.js", "node_modules", "dist", "coverage"]
 }
