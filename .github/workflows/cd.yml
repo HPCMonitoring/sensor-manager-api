@@ -80,13 +80,6 @@ jobs:
             
             curl https://raw.githubusercontent.com/HPCMonitoring/sensor-manager-api/master/docker-compose.yml -o docker-compose.yml
             docker-compose pull sensor-manager-api
-            docker-compose down --volumes --remove-orphans && docker-compose up -d
-            if [[ "${{ vars.RESET_DB }}" == "true" ]];
-            then
-              echo "Reset database !"
-              echo "Waiting for service ready ... "
-              sleep 10;
-              docker exec hpcmonitoring_sensor-manager-api yarn db:reset
-            fi;
+            docker-compose down --remove-orphans && docker-compose up -d
             docker logout ${{ env.REGISTRY }}
             
