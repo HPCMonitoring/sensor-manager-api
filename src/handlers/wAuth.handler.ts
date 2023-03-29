@@ -1,10 +1,10 @@
-import { WSCloseCode, WSSensorCode } from "@constants";
+import { WSCloseCode, WsCmd, WSSensorCode } from "@constants";
 import { W_UNAUTHORIZED, W_CLUSTER_NOT_EXIST, W_ID_NOT_EXIST, W_INTERVAL_SERVER, W_AUTHORIZED } from "@constants/wErrorMessages";
 import { SocketStream } from "@fastify/websocket";
 import { Sensor } from "@prisma/client";
 import { prisma } from "@repositories";
 import { WQueryString } from "@schemas/in";
-import { WSAuthMessage } from "@schemas/out";
+import { WSAuthPayload, WSSensorMessage } from "@schemas/out";
 import { sensorManager } from "@services";
 import { FastifyRequest } from "fastify";
 
@@ -25,17 +25,33 @@ const handleNewSensor = async (connection: SocketStream, req: FastifyRequest<{ Q
         }
     });
 
-    handleAuthSuccess(connection, sensor.id);
+    doAuthSuccess(connection, sensor.id);
     return sensor;
 };
 
-const handleAuthSuccess = (connection: SocketStream, id: string) => {
-    const authMessage: WSAuthMessage = {
-        id: id,
+const doAuthSuccess = (connection: SocketStream, id: string) => {
+    const authMessage: WSSensorMessage<WSAuthPayload> = {
+        cmd: WsCmd.AUTH,
         message: W_AUTHORIZED,
-        error: WSSensorCode.SUCCESS
+        error: WSSensorCode.SUCCESS,
+        payload: {
+            id: id
+        }
     };
     connection.socket.send(JSON.stringify(authMessage));
+};
+
+const doAuthFail = (connection: SocketStream, message: string) => {
+    const failMessage: WSSensorMessage<WSAuthPayload> = {
+        cmd: WsCmd.AUTH,
+        message: message,
+        error: WSSensorCode.UNAUTHORIZED,
+        payload: {
+            id: ""
+        }
+    };
+    connection.socket.send(JSON.stringify(failMessage));
+    connection.socket.close(WSCloseCode.UNAUTHORIZED, W_UNAUTHORIZED);
 };
 
 const handleAuth = async (connection: SocketStream, req: FastifyRequest<{ Querystring: WQueryString }>) => {
@@ -51,10 +67,10 @@ const handleAuth = async (connection: SocketStream, req: FastifyRequest<{ Querys
             })) > 0;
 
         if (!isExist) {
-            connection.socket.close(WSCloseCode.UNAUTHORIZED, W_ID_NOT_EXIST);
+            doAuthFail(connection, W_ID_NOT_EXIST);
             return;
         }
-        handleAuthSuccess(connection, req.query.id);
+        doAuthSuccess(connection, req.query.id);
         sensorManager.onSensorConnect(req.query.id, connection);
     } else {
         const cluster = await prisma.cluster.findFirst({
@@ -67,7 +83,7 @@ const handleAuth = async (connection: SocketStream, req: FastifyRequest<{ Querys
         });
 
         if (!cluster) {
-            connection.socket.close(WSCloseCode.UNAUTHORIZED, W_CLUSTER_NOT_EXIST);
+            doAuthFail(connection, W_CLUSTER_NOT_EXIST);
             return;
         }
         const sensor: Sensor = await handleNewSensor(connection, req, cluster.id);
@@ -78,7 +94,7 @@ const handleAuth = async (connection: SocketStream, req: FastifyRequest<{ Querys
 export const wAuthHandler = async (connection: SocketStream, req: FastifyRequest<{ Querystring: WQueryString }>) => {
     req.log.info(`Sensor connected: ip = ${req.ip}, query = ${JSON.stringify(req.query)}`);
     if (!req.headers.authorization || req.headers.authorization !== TEMP_PASSWORD) {
-        connection.socket.close(WSCloseCode.UNAUTHORIZED, W_UNAUTHORIZED);
+        doAuthFail(connection, W_UNAUTHORIZED);
         return;
     }
 

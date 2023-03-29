@@ -1,7 +1,7 @@
 import { idSchema, nullable } from "@schemas/common";
 import s from "fluent-json-schema";
 
-const allSensorStates: SensorState[] = ["RUNNING", "STOPPED", "DISCONNECTED", "REQUESTED"];
+const allSensorStates: SensorActionStatus[] = ["RUNNING", "STOPPED", "REQUESTED"];
 
 export const sensorSummarySchema = s
     .object()
@@ -16,7 +16,7 @@ export type SensorSummaryDto = {
     name: string;
     ipAddr: string;
     remarks: string | null;
-    state: SensorState;
+    state: SensorActionStatus;
 };
 
 const subscribeTopicSchema = s
@@ -70,6 +70,6 @@ export type SensorDetailDto = {
     arch: string;
     hostname: string;
     rootUser: string;
-    state: SensorState;
+    state: SensorActionStatus;
     subscribeTopics: SubscribeTopicDto[];
 };

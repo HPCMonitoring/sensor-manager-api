@@ -98,15 +98,17 @@ async function update(
     const sensorId = request.params.sensorId;
 
     for (const topic of payload.subscribeTopics) {
-        const filterAST = yaml.load(topic.script.replaceAll("\t", "  ")) as ConfigScriptAST;
-        const scriptValidate = ajv.compile(scriptSchema.valueOf());
-        const validateResult = scriptValidate(filterAST);
-        if (filterAST.type === "io") {
-            filterAST.fields.deviceName;
-        }
+        try {
+            const filterAST = yaml.load(topic.script.replaceAll("\t", "  ")) as ConfigScriptAST;
+            const scriptValidate = ajv.compile(scriptSchema.valueOf());
+            const validateResult = scriptValidate(filterAST);
 
-        if (!validateResult) {
-            request.log.error(scriptValidate.errors);
+            if (!validateResult) {
+                request.log.error(scriptValidate.errors);
+                return reply.badRequest(INVALID_SCRIPT);
+            }
+        } catch (err) {
+            request.log.error(err);
             return reply.badRequest(INVALID_SCRIPT);
         }
     }

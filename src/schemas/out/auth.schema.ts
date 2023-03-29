@@ -1,4 +1,3 @@
-import { WSSensorCode } from "@constants";
 import { idSchema } from "@schemas/common";
 import s from "fluent-json-schema";
 
@@ -9,8 +8,6 @@ export type AuthResultDto = {
     email: string;
 };
 
-export interface WSAuthMessage {
+export interface WSAuthPayload {
     id: string;
-    message: string;
-    error: WSSensorCode;
 }

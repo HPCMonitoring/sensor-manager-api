@@ -1,5 +1,5 @@
 export const W_ID_NOT_EXIST = "ID not exist";
 export const W_CLUSTER_NOT_EXIST = "Cluster not exist";
-export const W_UNAUTHORIZED = "Unauthoried";
-export const W_AUTHORIZED = "Authenticate";
-export const W_INTERVAL_SERVER = "Some thing went wrong in server";
+export const W_UNAUTHORIZED = "Unauthorized";
+export const W_AUTHORIZED = "Authenticated";
+export const W_INTERVAL_SERVER = "Somethings went wrong in server";
