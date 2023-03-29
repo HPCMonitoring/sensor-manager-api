@@ -1,5 +1,4 @@
 import fastify from "fastify";
-
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 import { apiPlugin, authPlugin } from "./plugins";
@@ -9,6 +8,7 @@ import { kafkaAdmin } from "@services";
 
 export function createServer(config: ServerConfig) {
     const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
+    global.logger = app.log;
 
     app.register(import("@fastify/sensible"));
     app.register(import("@fastify/helmet"));
