@@ -1,6 +1,7 @@
 import { SocketStream } from "@fastify/websocket";
 import { WsMessage, WsMessageWrap } from "@interfaces";
 import { assert } from "console";
+import WebSocket from "ws";
 
 type PExecutor<T = unknown> = {
     resolve: (value: T | PromiseLike<T>) => void;
@@ -97,7 +98,7 @@ export class SensorManagerServer {
             return "DISCONNECTED";
         }
         const state = this.liveSensors.get(id)?.connection.socket.readyState;
-        return state === WebSocket.OPEN ? "CONNECTED" : "DISCONNECTED";
+        return state === WebSocket.OPEN ? "RUNNING" : "DISCONNECTED";
     }
 }
 

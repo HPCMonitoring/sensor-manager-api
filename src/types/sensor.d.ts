@@ -1,2 +1,2 @@
 type SensorActionStatus = "RUNNING" | "STOPPED" | "REQUESTED";
-type SensorConnectionStatus = "CONNECTED" | "DISCONNECTED";
+type SensorConnectionStatus = "RUNNING" | "DISCONNECTED";

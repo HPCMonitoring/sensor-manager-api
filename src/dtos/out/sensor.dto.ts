@@ -16,7 +16,7 @@ export type SensorSummaryDto = {
     name: string;
     ipAddr: string;
     remarks: string | null;
-    state: SensorActionStatus;
+    state: SensorConnectionStatus;
 };
 
 const subscribeTopicSchema = s
@@ -70,6 +70,6 @@ export type SensorDetailDto = {
     arch: string;
     hostname: string;
     rootUser: string;
-    state: SensorActionStatus;
+    state: SensorConnectionStatus;
     subscribeTopics: SubscribeTopicDto[];
 };
