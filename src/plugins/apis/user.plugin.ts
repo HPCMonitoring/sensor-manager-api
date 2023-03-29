@@ -1,6 +1,6 @@
 import { HandlerTag } from "@constants";
 import { usersHandler } from "@handlers";
-import { filterTemplateSchema, kafkaBrokerSchema } from "@schemas/out";
+import { filterTemplateSchema, kafkaBrokerSchema } from "@dtos/out";
 import { createPlugin } from "@utils";
 import s from "fluent-json-schema";
 

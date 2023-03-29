@@ -1,8 +1,8 @@
 import { HandlerTag } from "@constants";
 import { clustersHandler } from "@handlers";
-import { idSchema } from "@schemas/common";
-import { clusterMutationSchema } from "@schemas/in";
-import { clusterMutationResultSchema, clusterSummarySchema } from "@schemas/out";
+import { idSchema } from "@dtos/common";
+import { clusterMutationSchema } from "@dtos/in";
+import { clusterMutationResultSchema, clusterSummarySchema } from "@dtos/out";
 import { createPlugin } from "@utils";
 import s from "fluent-json-schema";
 

@@ -1,4 +1,4 @@
-import { idSchema } from "@schemas/common";
+import { idSchema } from "@dtos/common";
 import s from "fluent-json-schema";
 
 export const kafkaTopicSchema = s.object().prop("id", idSchema).prop("name", s.string());

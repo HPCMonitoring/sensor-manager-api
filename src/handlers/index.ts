@@ -6,4 +6,4 @@ export * from "./auth.handler";
 export * from "./cluster.handler";
 export * from "./sensor.handler";
 export * from "./user.handler";
-export * from "./wAuth.handler";
+export * from "./wSetup.handler";

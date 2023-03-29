@@ -1,4 +1,4 @@
-import { nullable } from "@schemas/common";
+import { nullable } from "@dtos/common";
 import s from "fluent-json-schema";
 
 const aliasName = s.string().raw(nullable);
@@ -149,4 +149,3 @@ const diskScript = s
             .prop("mountedOn", aliasName)
     );
 export const scriptSchema = s.oneOf([processScript, networkInterfaceScript, memoryScript, cpuScript, ioScript, diskScript]);
-console.log(JSON.stringify(scriptSchema.valueOf(), null, 2));

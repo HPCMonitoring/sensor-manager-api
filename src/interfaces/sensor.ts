@@ -1,7 +1,29 @@
-import { SocketStream } from "@fastify/websocket";
+import { WsCmd, WSSensorCode } from "@constants";
 
-export interface SensorSession {
+export enum LiveStatus {
+    DISCONNECTED,
+    CONNECTED
+}
+
+export interface WsMessage<T> {
+    cmd: WsCmd;
+    message: string;
+    error: WSSensorCode;
+    payload: T | "{}";
+}
+
+export interface WsMessageWrap<T> extends WsMessage<T> {
+    coordId: string;
+}
+
+export interface WSAuthPayload {
     id: string;
-    lastPingTime: Date;
-    connection: SocketStream;
+}
+
+export interface WsSysInfoPayload {
+    kernelName: string;
+    kernelVersion: string;
+    arch: string;
+    hostname: string;
+    rootUser: string;
 }

@@ -32,7 +32,7 @@ Visit our [documentation](https://hpcmonitoring.github.io/docs) for more details
  ┣ 📂constants      # Constants and enums go here
  ┣ 📂handlers       # Handlers, which are responsible for handling core business logic
  ┣ 📂plugins        # Plugin, in charge of organizing api path & registering middleware
- ┣ 📂schemas        # Schema for input (from requests) & output (from responses)
+ ┣ 📂dtos           # Schema for input (from requests) & output (from responses)
  ┃ ┣ 📂in
  ┃ ┗ 📂out
  ┣ 📂types          # Types

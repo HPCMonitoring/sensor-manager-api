@@ -1,7 +1,7 @@
 import { INVALID_SCRIPT, SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
-import { scriptSchema, UpdateSensorDto } from "@schemas/in";
-import { SensorDetailDto, SensorSummaryDto } from "@schemas/out";
+import { scriptSchema, UpdateSensorDto } from "@dtos/in";
+import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
 import Ajv from "ajv";
 import yaml from "js-yaml";
