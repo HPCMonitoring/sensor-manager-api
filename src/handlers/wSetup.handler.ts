@@ -4,7 +4,7 @@ import { SocketStream } from "@fastify/websocket";
 import { LiveSensor } from "@services";
 import { Sensor } from "@prisma/client";
 import { prisma } from "@repositories";
-import { WQueryString } from "@schemas/in";
+import { WQueryString } from "@dtos/in";
 import { sensorManager } from "@services";
 import { FastifyRequest } from "fastify";
 import { WsMessage, WSAuthPayload, WsMessageWrap, WsSysInfoPayload } from "@interfaces";

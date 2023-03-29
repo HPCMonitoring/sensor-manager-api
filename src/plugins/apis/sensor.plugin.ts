@@ -1,8 +1,8 @@
 import { HandlerTag } from "@constants";
 import { sensorHandler } from "@handlers";
-import { idSchema } from "@schemas/common";
-import { updateSensorSchema } from "@schemas/in";
-import { sensorSummarySchema, sensorDetailSchema } from "@schemas/out";
+import { idSchema } from "@dtos/common";
+import { updateSensorSchema } from "@dtos/in";
+import { sensorSummarySchema, sensorDetailSchema } from "@dtos/out";
 import { createPlugin } from "@utils";
 import s from "fluent-json-schema";
 

@@ -1,4 +1,4 @@
-import { nullable } from "@schemas/common";
+import { nullable } from "src/dtos/common.schema";
 import s from "fluent-json-schema";
 
 const aliasName = s.string().raw(nullable);

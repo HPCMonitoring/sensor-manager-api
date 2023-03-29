@@ -1,5 +1,5 @@
 import { ID_LENGTH, MIN_INTERVAL } from "@constants";
-import { idSchema, nullable } from "@schemas/common";
+import { idSchema, nullable } from "src/dtos/common.schema";
 import s from "fluent-json-schema";
 
 const subscribeTopic = s

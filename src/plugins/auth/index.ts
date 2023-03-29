@@ -1,7 +1,7 @@
 import { HandlerTag } from "@constants";
 import { authHandler } from "@handlers";
-import { authInputSchema } from "@schemas/in";
-import { authResultSchema } from "@schemas/out";
+import { authInputSchema } from "@dtos/in";
+import { authResultSchema } from "@dtos/out";
 import { createPlugin } from "@utils";
 
 export const authPlugin = createPlugin(

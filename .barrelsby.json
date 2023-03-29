@@ -2,8 +2,8 @@
     "directory": [
         "./src/handlers",
         "./src/constants",
-        "./src/schemas/in",
-        "./src/schemas/out",
+        "./src/dtos/in",
+        "./src/dtos/out",
         "./src/configs",
         "./src/middlewares",
         "./src/services",

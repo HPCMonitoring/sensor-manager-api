@@ -1,10 +1,12 @@
 import { SocketStream } from "@fastify/websocket";
 import { WsMessage, WsMessageWrap } from "@interfaces";
 import { assert } from "console";
+
 type PExecutor<T = unknown> = {
     resolve: (value: T | PromiseLike<T>) => void;
     reject: (reason?: unknown) => void;
 };
+
 const SEQUENCE_BITS = 8;
 
 export class LiveSensor {

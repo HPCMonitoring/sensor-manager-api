@@ -5,8 +5,8 @@ import { cookieOptions, DUPLICATED_EMAIL, LOGIN_FAIL, SALT_ROUNDS, USER_NOT_FOUN
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@configs";
 import { User } from "@prisma/client";
-import { AuthInputDto } from "@schemas/in";
-import { AuthResultDto } from "@schemas/out";
+import { AuthInputDto } from "@dtos/in";
+import { AuthResultDto } from "@dtos/out";
 
 async function login(request: FastifyRequest<{ Body: AuthInputDto }>, reply: FastifyReply): Result<AuthResultDto> {
     const user = await prisma.user.findUnique({

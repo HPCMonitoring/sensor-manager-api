@@ -1,4 +1,4 @@
-import { idSchema, nullable } from "@schemas/common";
+import { idSchema, nullable } from "src/dtos/common.schema";
 import s from "fluent-json-schema";
 
 export const filterTemplateSchema = s

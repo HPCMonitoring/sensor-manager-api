@@ -1,7 +1,7 @@
 import { CLUSTER_NOT_EXISTS, DUPLICATED_CLUSTER } from "@constants";
 import { prisma } from "@repositories";
-import { ClusterMutationDto } from "@schemas/in";
-import { ClusterSummaryDto, ClusterMutationResultDto } from "@schemas/out";
+import { ClusterMutationDto } from "@dtos/in";
+import { ClusterSummaryDto, ClusterMutationResultDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 async function getAll(): Result<ClusterSummaryDto[]> {
