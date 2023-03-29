@@ -1,8 +1,12 @@
-import { SENSOR_NOT_EXISTS } from "@constants";
+import { INVALID_SCRIPT, SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
-import { UpdateSensorDto } from "@schemas/in";
+import { scriptSchema, UpdateSensorDto } from "@schemas/in";
 import { SensorDetailDto, SensorSummaryDto } from "@schemas/out";
 import { FastifyReply, FastifyRequest } from "fastify";
+import Ajv from "ajv";
+import yaml from "js-yaml";
+
+const ajv = new Ajv({ allErrors: false, strict: false });
 
 async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<SensorSummaryDto[]> {
     const sensors = await prisma.sensor.findMany({
@@ -87,10 +91,26 @@ async function update(
     request: FastifyRequest<{
         Params: { sensorId: string };
         Body: UpdateSensorDto;
-    }>
+    }>,
+    reply: FastifyReply
 ): Result<string> {
     const payload = request.body;
     const sensorId = request.params.sensorId;
+
+    for (const topic of payload.subscribeTopics) {
+        const filterAST = yaml.load(topic.script.replaceAll("\t", "  ")) as ConfigScriptAST;
+        const scriptValidate = ajv.compile(scriptSchema.valueOf());
+        const validateResult = scriptValidate(filterAST);
+        if (filterAST.type === "io") {
+            filterAST.fields.deviceName;
+        }
+
+        if (!validateResult) {
+            request.log.error(scriptValidate.errors);
+            return reply.badRequest(INVALID_SCRIPT);
+        }
+    }
+
     await prisma.$transaction([
         prisma.sensorTopicConfig.deleteMany({
             where: { sensorId }

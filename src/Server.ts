@@ -5,6 +5,7 @@ import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfi
 import { apiPlugin, authPlugin } from "./plugins";
 import { wQuerySchema } from "@schemas/in";
 import { wAuthHandler } from "@handlers";
+import { kafkaAdmin } from "@services";
 
 export function createServer(config: ServerConfig) {
     const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
@@ -44,6 +45,7 @@ export function createServer(config: ServerConfig) {
 
     app.ready().then(() => {
         app.swagger({ yaml: true });
+        kafkaAdmin.connect().then(() => app.log.info("Kakfa admin connected"));
         app.log.info(`Swagger documentation is on http://${config.host}:${config.port}/docs`);
     });
 
@@ -56,10 +58,17 @@ export function createServer(config: ServerConfig) {
             function (err) {
                 if (err) {
                     app.log.error(err);
-                    process.exit(1);
+                    kafkaAdmin.disconnect().then(() => process.exit(1));
                 }
             }
         );
+        process.on("SIGINT", () => {
+            app.log.info("Disconnect kafka admin ...");
+            kafkaAdmin.disconnect().then(() => {
+                app.log.info("Exited program");
+                process.exit(0);
+            });
+        });
     };
 
     return {

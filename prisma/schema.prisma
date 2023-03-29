@@ -69,7 +69,7 @@ model SensorTopicConfig {
   sensor           Sensor          @relation(fields: [sensorId], references: [id], onDelete: Cascade)
   kafkaTopic       KafkaTopic      @relation(fields: [kafkaTopicId], references: [id], onDelete: Cascade)
   interval         Float
-  script           String
+  script           String          @default("# YAML script")
   sensorId         String
   kafkaTopicId     String
   usingTemplate    FilterTemplate? @relation(fields: [filterTemplateId], references: [id])

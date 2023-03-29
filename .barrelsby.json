@@ -5,7 +5,8 @@
         "./src/schemas/in",
         "./src/schemas/out",
         "./src/configs",
-        "./src/middlewares"
+        "./src/middlewares",
+        "./src/services"
     ],
     "exclude": ["__mock__", "__mocks__", ".spec.ts"],
     "delete": true
