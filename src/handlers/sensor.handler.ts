@@ -5,6 +5,7 @@ import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
 import Ajv from "ajv";
 import yaml from "js-yaml";
+import { sensorManager } from "@services";
 
 const ajv = new Ajv({ allErrors: false, strict: false });
 
@@ -20,7 +21,7 @@ async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId
             clusterId: request.query.clusterId
         }
     });
-    return sensors.map((sensor) => ({ ...sensor, state: "RUNNING" }));
+    return sensors.map((sensor) => ({ ...sensor, state: sensorManager.getStatus(sensor.id) }));
 }
 
 async function getById(
@@ -74,7 +75,7 @@ async function getById(
         arch: sensor.arch,
         hostname: sensor.hostname,
         rootUser: sensor.rootUser,
-        state: "RUNNING",
+        state: sensorManager.getStatus(sensor.id),
         subscribeTopics: sensor.topicConfigs.map((topicConfig) => ({
             key: topicConfig.id,
             id: topicConfig.kafkaTopic.id,
