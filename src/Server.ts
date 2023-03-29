@@ -6,7 +6,7 @@ import { apiPlugin, authPlugin } from "./plugins";
 import { ServerConfig } from "@types";
 import fastifyWebSocket from "@fastify/websocket";
 import { wQuerySchema } from "@schemas/in";
-import { wAuthHandler } from "@handlers";
+import { wSetupHandler } from "@handlers";
 
 export function createServer(config: ServerConfig) {
     const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
@@ -40,7 +40,7 @@ export function createServer(config: ServerConfig) {
                 websocket: true,
                 schema: { querystring: wQuerySchema }
             },
-            wAuthHandler
+            wSetupHandler
         );
     });
 

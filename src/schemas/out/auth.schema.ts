@@ -10,7 +10,3 @@ export type AuthOutput = {
     id: string;
     email: string;
 };
-
-export interface WSAuthPayload {
-    id: string;
-}

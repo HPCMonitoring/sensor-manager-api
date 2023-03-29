@@ -1,4 +1,3 @@
-import { SocketStream } from "@fastify/websocket";
 import { LiveSensor, LiveStatus } from "@models";
 
 export class SensorManagerServer {
@@ -7,20 +6,8 @@ export class SensorManagerServer {
         this.liveSensors = new Map();
     }
 
-    onSensorConnect(id: string, connection: SocketStream) {
-        connection.socket.on("ping", () => {
-            this.onSensorConnect(id, connection);
-        });
-        this.onSensorPing(id, connection);
-    }
-
-    onSensorPing(id: string, connection: SocketStream) {
-        const sensor: LiveSensor = {
-            id: id,
-            lastPingTime: new Date(),
-            connection: connection
-        };
-        this.liveSensors.set(sensor.id, sensor);
+    onSensorConnect(liveSensor: LiveSensor) {
+        this.liveSensors.set(liveSensor.id, liveSensor);
     }
 
     getStatus(id: string): LiveStatus {
