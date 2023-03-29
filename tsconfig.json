@@ -39,13 +39,12 @@
             "@schemas/common": ["src/schemas/common.schema"],
             "@configs": ["src/configs"],
             "@configs/*": ["src/configs/*"],
-            "@types": ["src/types"],
-            "@types/*": ["src/types/*"],
             "@repositories": ["src/prisma"],
             "@utils": ["src/utils"],
             "@middlewares": ["src/middlewares"],
             "@middlewares/*": ["src/middlewares/*"],
-            "@models": ["src/models"],
+            "@interfaces": ["src/interfaces"],
+            "@interfaces/*": ["src/interfaces/*"]
         }
     },
     "include": ["src", "**/*.js", "**/*.ts"],

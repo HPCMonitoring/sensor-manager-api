@@ -78,15 +78,8 @@ jobs:
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
             
-            # curl https://raw.githubusercontent.com/HPCMonitoring/sensor-manager-api/master/docker-compose.yml -o docker-compose.yml
+            curl https://raw.githubusercontent.com/HPCMonitoring/sensor-manager-api/master/docker-compose.yml -o docker-compose.yml
             docker-compose pull sensor-manager-api
-            if [[ "${{ vars.CLEAR_VOLUME }}" == "true" ]];
-            then
-              echo "Drop old database !"
-              docker-compose down --volumes --remove-orphans && docker-compose up -d
-            else
-              echo "Use old database"
-              docker-compose down && docker-compose up -d
-            fi
+            docker-compose down --remove-orphans && docker-compose up -d
             docker logout ${{ env.REGISTRY }}
             

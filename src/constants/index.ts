@@ -7,5 +7,6 @@ export * from "./constraints";
 export * from "./cookie";
 export * from "./crypt";
 export * from "./errorMessages";
+export * from "./kafka";
 export * from "./swagger";
 export * from "./wErrorMessages";

@@ -15,19 +15,14 @@ Visit our [documentation](https://hpcmonitoring.github.io/docs) for more details
 - `node` v18.13.0
 - `npm` 8.19.3
 
-## How to start
+## Commands
 
-Run one command to set up for development:
-
-```bash
-yarn bootstrap
-```
-
-Start project:
-
-```bash
-yarn start
-```
+- `yarn bootstrap`: Set up development
+- `yarn start`: Start application in dev mode
+- `yarn db:reset`: Reset database and run seed
+- `yarn db:reset:prod`: Reset database in **production** and run seed
+- `yarn db:studio`: Inspect database and host as a web UI
+- `yarn clean:git`: Clean local branches which were merged on remote
 
 ## Project structure
 

@@ -1,4 +1,4 @@
-export type ServerConfig = {
+type ServerConfig = {
     host: string;
     port: number;
 };

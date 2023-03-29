@@ -3,10 +3,9 @@ import fastify from "fastify";
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 import { apiPlugin, authPlugin } from "./plugins";
-import { ServerConfig } from "@types";
-import fastifyWebSocket from "@fastify/websocket";
 import { wQuerySchema } from "@schemas/in";
 import { wAuthHandler } from "@handlers";
+import { kafkaAdmin } from "@services";
 
 export function createServer(config: ServerConfig) {
     const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
@@ -31,7 +30,7 @@ export function createServer(config: ServerConfig) {
     app.register(authPlugin, { prefix: "/auth" });
     app.register(apiPlugin, { prefix: "/api" });
 
-    app.register(fastifyWebSocket);
+    app.register(import("@fastify/websocket"));
 
     app.register(async function (fastify) {
         fastify.get(
@@ -46,6 +45,7 @@ export function createServer(config: ServerConfig) {
 
     app.ready().then(() => {
         app.swagger({ yaml: true });
+        kafkaAdmin.connect().then(() => app.log.info("Kakfa admin connected"));
         app.log.info(`Swagger documentation is on http://${config.host}:${config.port}/docs`);
     });
 
@@ -58,10 +58,17 @@ export function createServer(config: ServerConfig) {
             function (err) {
                 if (err) {
                     app.log.error(err);
-                    process.exit(1);
+                    kafkaAdmin.disconnect().then(() => process.exit(1));
                 }
             }
         );
+        process.on("SIGINT", () => {
+            app.log.info("Disconnect kafka admin ...");
+            kafkaAdmin.disconnect().then(() => {
+                app.log.info("Exited program");
+                process.exit(0);
+            });
+        });
     };
 
     return {

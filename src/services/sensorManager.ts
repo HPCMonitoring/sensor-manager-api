@@ -1,8 +1,8 @@
 import { SocketStream } from "@fastify/websocket";
-import { LiveSensor, LiveStatus } from "@models";
+import { SensorSession } from "@interfaces";
 
 export class SensorManagerServer {
-    liveSensors: Map<string, LiveSensor>;
+    liveSensors: Map<string, SensorSession>;
     constructor() {
         this.liveSensors = new Map();
     }
@@ -15,7 +15,7 @@ export class SensorManagerServer {
     }
 
     onSensorPing(id: string, connection: SocketStream) {
-        const sensor: LiveSensor = {
+        const sensor: SensorSession = {
             id: id,
             lastPingTime: new Date(),
             connection: connection
@@ -23,12 +23,12 @@ export class SensorManagerServer {
         this.liveSensors.set(sensor.id, sensor);
     }
 
-    getStatus(id: string): LiveStatus {
+    getStatus(id: string): SensorConnectionStatus {
         if (!this.liveSensors.has(id)) {
-            return LiveStatus.DISCONNECTED;
+            return "DISCONNECTED";
         }
         const state = this.liveSensors.get(id)?.connection.socket.readyState;
-        return state === WebSocket.OPEN ? LiveStatus.CONNECTED : LiveStatus.DISCONNECTED;
+        return state === WebSocket.OPEN ? "CONNECTED" : "DISCONNECTED";
     }
 }
 

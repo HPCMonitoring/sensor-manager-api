@@ -6,7 +6,6 @@ import { prisma } from "@repositories";
 import { WQueryString } from "@schemas/in";
 import { WSAuthPayload, WSSensorMessage } from "@schemas/out";
 import { sensorManager } from "@services";
-import { wlogger } from "@utils";
 import { FastifyRequest } from "fastify";
 
 const TEMP_PASSWORD = "hpc-monitoring-sensor";
@@ -93,7 +92,7 @@ const handleAuth = async (connection: SocketStream, req: FastifyRequest<{ Querys
 };
 
 export const wAuthHandler = async (connection: SocketStream, req: FastifyRequest<{ Querystring: WQueryString }>) => {
-    wlogger.info(`Sensor connected: ip = ${req.ip}, query = ${JSON.stringify(req.query)}`);
+    req.log.info(`Sensor connected: ip = ${req.ip}, query = ${JSON.stringify(req.query)}`);
     if (!req.headers.authorization || req.headers.authorization !== TEMP_PASSWORD) {
         doAuthFail(connection, W_UNAUTHORIZED);
         return;
