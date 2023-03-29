@@ -1,4 +1,4 @@
-import { nullable } from "src/dtos/common.schema";
+import { nullable } from "@dtos/common";
 import s from "fluent-json-schema";
 
 export const clusterMutationSchema = s.object().prop("name", s.string().required()).prop("remarks", s.string().raw(nullable));
