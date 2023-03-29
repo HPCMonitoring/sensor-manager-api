@@ -1,3 +1,4 @@
+import { WSCloseCode } from "@constants";
 import { SocketStream } from "@fastify/websocket";
 import { WsMessage, WsMessageWrap } from "@interfaces";
 import { assert } from "console";
@@ -45,10 +46,14 @@ export class LiveSensor {
             coordId: coordId
         };
 
-        this.connection.socket.send(JSON.stringify(sentData), (err) => {
-            if (err) {
-                this.reqResCb.get(coordId)?.reject(`Command: ${message.cmd} with coorId: ${coordId} send error`);
-            }
+        return new Promise<undefined>((resolve, reject) => {
+            this.connection.socket.send(JSON.stringify(sentData), (err) => {
+                if (err) {
+                    reject(`Command: ${message.cmd} with coorId: ${coordId} send error`);
+                } else {
+                    resolve(undefined);
+                }
+            });
         });
     }
 
@@ -75,10 +80,15 @@ export class LiveSensor {
         const timeoutPromise = new Promise<T>((_resolve, reject) => {
             setTimeout(() => {
                 reject(`Command: ${message.cmd} with coorId: ${coordId} receive response timeout`);
+                this.reqResCb.delete(coordId);
             }, timeout);
         });
 
         return Promise.race<T>([resPromise, timeoutPromise]);
+    }
+
+    close(code: WSCloseCode, message: string) {
+        this.connection.socket.close(code, message);
     }
 }
 
