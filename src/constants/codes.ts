@@ -14,8 +14,11 @@ export enum WSSensorCode {
     UNKNOWN = 999
 }
 
-// For convention, these commands should be in range 1000 - 1999
+// When add new command, please follows these convetion
+// Command from 1000 - 1999 is one-way command
+// Command from 2000 - 2999 is request response command
+// Command from 3000 - 3999 is push command
 export enum WsCmd {
     AUTH = 1000,
-    SYS_INFO = 1001
+    SYS_INFO = 2000
 }

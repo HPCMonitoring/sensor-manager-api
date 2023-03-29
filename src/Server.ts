@@ -3,8 +3,8 @@ import type { FastifyCookieOptions } from "@fastify/cookie";
 import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 import { apiPlugin, authPlugin } from "./plugins";
 import { wQuerySchema } from "@schemas/in";
-import { wAuthHandler } from "@handlers";
 import { kafkaAdmin } from "@services";
+import { wSetupHandler } from "@handlers";
 
 export function createServer(config: ServerConfig) {
     const app = fastify({ logger: loggerConfig[ENVIRONMENT] });
@@ -39,7 +39,7 @@ export function createServer(config: ServerConfig) {
                 websocket: true,
                 schema: { querystring: wQuerySchema }
             },
-            wAuthHandler
+            wSetupHandler
         );
     });
 

@@ -7,7 +7,3 @@ export type AuthResultDto = {
     id: string;
     email: string;
 };
-
-export interface WSAuthPayload {
-    id: string;
-}
