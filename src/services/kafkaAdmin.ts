@@ -6,9 +6,4 @@ const kafkaClient = new Kafka({
     brokers: ["localhost:9092"]
 });
 
-const admin = kafkaClient.admin();
-admin.connect().then(() => {
-    console.log("Kakfa admin created !");
-});
-
-export const kafkaAdmin = admin;
+export const kafkaAdmin = kafkaClient.admin();

@@ -10,3 +10,4 @@ export const DUPLICATED_CLUSTER = "Cluster name already exists !";
 export const CLUSTER_NOT_EXISTS = "Cluster not exists !";
 
 export const SENSOR_NOT_EXISTS = "Sensor not exists !";
+export const INVALID_SCRIPT = "Invalid script !";

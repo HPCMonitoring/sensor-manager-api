@@ -9,13 +9,12 @@ const user = {
     password: "123456789"
 };
 
-const yamlScript = `name: CD
-
-on:
-  push:
-    branches: ["master"]
-  pull_request:
-    branches: ["master"]
+const yamlScript = `# Config script
+type: process
+fields:
+  pid: processId
+  name: processName
+  virtualMemoryUsage: RAM
 `;
 
 async function generateSampleData() {
