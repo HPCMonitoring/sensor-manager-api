@@ -18,39 +18,46 @@ type IOField = "deviceName" | "readPerSecond" | "writePerSecond";
 type DiskField = "filesystem" | "used" | "available" | "mountedOn";
 
 type NotEqExpr = "lt" | "lte" | "gt" | "gte";
-type PartialRecord<K extends string, V> = Partial<Record<K, V>>;
 
-type Condition = PartialRecord<ProcessEqField, number> &
-    PartialRecord<ProcessRegexField, { like: string }> &
-    PartialRecord<ProcessNotEqField, PartialRecord<NotEqExpr, number>> & {
-        AND?: Enumerable<Condition>;
-        OR?: Enumerable<Condition>;
-    };
+type PartialRecord<K extends string, V> = Partial<Record<K, V>>;
+type EqCondition = PartialRecord<ProcessEqField, number>;
+type NotEqCondition = PartialRecord<ProcessNotEqField, PartialRecord<NotEqExpr, number>>;
+type RegexCondition = PartialRecord<ProcessRegexField, { like: string }>;
+type AndCondition = { AND?: Condition[] };
+type OrCondition = { OR?: Condition[] };
+
+type Condition = EqCondition & RegexCondition & NotEqCondition & AndCondition & OrCondition;
 
 type Enumerable<T> = T | T[];
-type ConfigScriptAST =
-    | {
-          type: "process";
-          fields: PartialRecord<ProcessField, string | null>;
-          filters?: Condition;
-      }
-    | {
-          type: "network_interface";
-          fields: PartialRecord<NetworkInterfaceField, string | null>;
-      }
-    | {
-          type: "memory";
-          fields: PartialRecord<MemoryField, string | null>;
-      }
-    | {
-          type: "cpu";
-          fields: PartialRecord<CpuField, string | null>;
-      }
-    | {
-          type: "io";
-          fields: PartialRecord<IOField, string | null>;
-      }
-    | {
-          type: "disk";
-          fields: PartialRecord<DiskField, string | null>;
-      };
+type ProcessScript = {
+    type: "process";
+    fields: PartialRecord<ProcessField, string | null>;
+    filters?: AndCondition | OrCondition;
+};
+
+type NetworkInterfaceScript = {
+    type: "network_interface";
+    fields: PartialRecord<NetworkInterfaceField, string | null>;
+};
+
+type MemScript = {
+    type: "memory";
+    fields: PartialRecord<MemoryField, string | null>;
+};
+
+type CpuScript = {
+    type: "cpu";
+    fields: PartialRecord<CpuField, string | null>;
+};
+
+type IOScript = {
+    type: "io";
+    fields: PartialRecord<IOField, string | null>;
+};
+
+type DiskScript = {
+    type: "disk";
+    fields: PartialRecord<DiskField, string | null>;
+};
+
+type ConfigScriptAST = ProcessScript | NetworkInterfaceScript | MemScript | CpuScript | IOScript | DiskScript;
