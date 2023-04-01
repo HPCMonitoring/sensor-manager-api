@@ -1,107 +1,90 @@
-import {
-    cpuScript,
-    diskScript,
-    equalCondition,
-    ioScript,
-    likeCondition,
-    memoryScript,
-    networkInterfaceScript,
-    notEqualCondition,
-    processScript
-} from "@dtos/in";
+import { equalCondition, likeCondition, notEqualCondition } from "@dtos/in";
 import Ajv, { ValidateFunction } from "ajv";
 const ajv = new Ajv({ allErrors: false, strict: false });
 
+const AND_OP = "&&";
+const OR_OP = "||";
+const EQ_OP = "==";
+const LIKE_OP = "%=";
+type NotEqOp = "<" | "<=" | ">" | ">=";
+
+const NotEqOpMap: Record<NotEqExpr, NotEqOp> = {
+    lt: "<",
+    lte: "<=",
+    gt: ">",
+    gte: ">="
+};
+
 class ScriptParser {
-    private processValidator: ValidateFunction<unknown>;
-    private neworkValidator: ValidateFunction<unknown>;
-    private memValidator: ValidateFunction<unknown>;
-    private cpuValidator: ValidateFunction<unknown>;
-    private ioValidator: ValidateFunction<unknown>;
-    private diskValidator: ValidateFunction<unknown>;
     private equalCondValidator: ValidateFunction<unknown>;
     private notEqCondValidator: ValidateFunction<unknown>;
     private likeCondValidator: ValidateFunction<unknown>;
     constructor() {
-        this.processValidator = ajv.compile(processScript.valueOf());
-        this.neworkValidator = ajv.compile(networkInterfaceScript.valueOf());
-        this.memValidator = ajv.compile(memoryScript.valueOf());
-        this.cpuValidator = ajv.compile(cpuScript.valueOf());
-        this.ioValidator = ajv.compile(ioScript.valueOf());
-        this.diskValidator = ajv.compile(diskScript.valueOf());
         this.equalCondValidator = ajv.compile(equalCondition.valueOf());
         this.notEqCondValidator = ajv.compile(notEqualCondition.valueOf());
         this.likeCondValidator = ajv.compile(likeCondition.valueOf());
     }
-    visitConfigScript(script: ConfigScriptAST) {
-        if (this.processValidator(script)) {
-            return this.visitProcessScript(script as ProcessScript);
-        } else if (this.memValidator(script)) {
-            throw new Error("Not implemented");
-        } else if (this.neworkValidator(script)) {
-            throw new Error("Not implemented");
-        } else if (this.cpuValidator(script)) {
-            throw new Error("Not implemented");
-        } else if (this.ioValidator(script)) {
-            throw new Error("Not implemented");
-        } else if (this.diskValidator(script)) {
-            throw new Error("Not implemented");
-        } else {
-            throw new Error("Undefined schema");
-        }
-    }
 
-    visitProcessScript(script: ProcessScript) {
-        if (!script.filters) {
+    toPrefixCommand(filters: AndCondition | OrCondition | undefined) {
+        if (!filters) {
             throw new Error("Not implmented");
-        } else if ("AND" in script.filters) {
-            return this.visitAndCondition(script.filters as AndCondition);
+        } else if ("AND" in filters) {
+            return this.visitAndCondition(filters as AndCondition);
         } else {
-            return this.visitOrCondition(script.filters as OrCondition);
+            return this.visitOrCondition(filters as OrCondition);
         }
     }
 
-    visitAndCondition(script: AndCondition) {
-        if (!script.AND) {
+    private visitAndCondition(filters: AndCondition) {
+        if (!filters.AND) {
             throw new Error("Not implemented");
         }
-        const numOperand = script.AND.length;
-        const operands = script.AND.map((c) => this.visitCondition(c));
-        return `AND ${numOperand} ${operands}`;
+        const numOperand = filters.AND.length;
+        const operands = filters.AND.map((c) => this.visitCondition(c));
+        return `${AND_OP} ${numOperand} ${operands}`;
     }
 
-    visitOrCondition(script: OrCondition) {
-        if (!script.OR) {
+    private visitOrCondition(filters: OrCondition) {
+        if (!filters.OR) {
             throw new Error("Not implemented");
         }
-        const numOperand = script.OR.length;
-        const operands = script.OR.map((c) => this.visitCondition(c));
-        return `OR ${numOperand} ${operands}`;
+        const numOperand = filters.OR.length;
+        const operands = filters.OR.map((c) => this.visitCondition(c));
+        return `${OR_OP} ${numOperand} ${operands}`;
     }
 
-    visitCondition(script: Condition) {
-        if (this.equalCondValidator(script)) {
-            return this.visitEqCond(script);
-        } else if (this.notEqCondValidator(script)) {
-            throw new Error("Not implemented");
-        } else if (this.likeCondValidator(script)) {
-            throw new Error("Not implemented");
+    private visitCondition(filters: Condition) {
+        let expressions: string[] = [];
+        if (this.equalCondValidator(filters)) {
+            expressions = expressions.concat(this.visitEqCond(filters));
+        } else if (this.notEqCondValidator(filters)) {
+            expressions = expressions.concat(this.visitNotEqCond(filters));
+        } else if (this.likeCondValidator(filters)) {
+            expressions = expressions.concat(this.visitLikeCond(filters));
         }
+        return `${AND_OP} ${expressions.length} ${expressions.join(" ")}`;
     }
 
-    visitEqCond(script: EqCondition) {
-        const operands = Object.entries(script)
+    private visitEqCond(filters: EqCondition) {
+        return Object.entries(filters)
             .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([k, v]) => `${k} ${v}`);
-        return `AND ${operands.length} ${operands.join(" ")}`;
+            .map(([k, v]) => `${EQ_OP} ${k} ${v}`);
     }
 
-    visitNotEqCond(script: NotEqCondition) {
-        return script;
+    private visitNotEqCond(filters: NotEqCondition) {
+        return Object.entries(filters)
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .flatMap(([k, v]) =>
+                Object.entries(v)
+                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .map(([k1, v1]) => `${NotEqOpMap[k1 as keyof typeof v]} ${k} ${v1}`)
+            );
     }
 
-    visitLikeCond(script: RegexCondition) {
-        return script;
+    visitLikeCond(filters: RegexCondition) {
+        return Object.entries(filters)
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .map(([k, v]) => `${LIKE_OP} ${k} "${v.like}"`);
     }
 }
 
