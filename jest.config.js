@@ -38,5 +38,16 @@ module.exports = {
     // A map from regular expressions to paths to transformers
     transform: {
         "\\.(ts)$": "ts-jest"
-    }
+    },
+    moduleNameMapper: {
+        "@services": "src/services",
+        "@configs": "src/configs",
+        "@constants": "<rootDir>/src/constants",
+        "@dtos/common": "<rootDir>/src/dtos/common.dto.ts",
+        "@dtos/in": "<rootDir>/src/dtos/in",
+        "@dtos/out": "<rootDir>/src/dtos/out"
+    },
+    roots: ["<rootDir>"],
+    modulePaths: ["<rootDir>"],
+    moduleDirectories: ["node_modules"]
 };
