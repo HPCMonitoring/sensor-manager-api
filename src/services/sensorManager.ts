@@ -37,6 +37,7 @@ export class LiveSensor {
             global.logger.debug(`On message: id = ${this.id} and message = ${data.toString()}`);
             const messageWrap: WsMessageWrap<unknown> = JSON.parse(data.toString());
             this.reqResCb.get(messageWrap.coordId)?.resolve({ ...messageWrap });
+            this.reqResCb.delete(messageWrap.coordId);
         });
     }
 
