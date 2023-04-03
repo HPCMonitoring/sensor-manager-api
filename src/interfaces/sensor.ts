@@ -27,3 +27,23 @@ export interface WsSysInfoPayload {
     hostname: string;
     rootUser: string;
 }
+
+export interface SensorConfig {
+    broker: string;
+    topicName: string;
+    interval: number;
+    script: ConfigScriptAST;
+}
+
+export interface WsTopicPayload {
+    broker: string;
+    topicName: string;
+    interval: number;
+    type: string;
+    fields: Record<string, string>;
+    prefixCommand: string;
+}
+
+export interface WsConfigPayload {
+    topics: WsTopicPayload[];
+}

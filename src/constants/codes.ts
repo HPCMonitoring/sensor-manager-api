@@ -20,5 +20,6 @@ export enum WSSensorCode {
 // Command from 3000 - 3999 is push command
 export enum WsCmd {
     AUTH = 1000,
-    SYS_INFO = 2000
+    SYS_INFO = 2000,
+    CONFIG = 2001
 }

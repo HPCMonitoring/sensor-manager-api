@@ -1,4 +1,4 @@
-import { INVALID_SCRIPT, SENSOR_NOT_EXISTS } from "@constants";
+import { INVALID_SCRIPT, SENSOR_NOT_EXISTS, TOPIC_NOT_FOUND } from "@constants";
 import { prisma } from "@repositories";
 import { scriptSchema, UpdateSensorDto } from "@dtos/in";
 import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
@@ -6,6 +6,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import Ajv from "ajv";
 import yaml from "js-yaml";
 import { sensorManager } from "@services";
+import { SensorConfig } from "@interfaces";
 
 const ajv = new Ajv({ allErrors: false, strict: false });
 
@@ -97,6 +98,7 @@ async function update(
 ): Result<string> {
     const payload = request.body;
     const sensorId = request.params.sensorId;
+    const sensorConfigIns: SensorConfig[] = [];
 
     for (const topic of payload.subscribeTopics) {
         try {
@@ -104,39 +106,70 @@ async function update(
             const scriptValidate = ajv.compile(scriptSchema.valueOf());
             const validateResult = scriptValidate(filterAST);
 
+            const sink = await prisma.kafkaTopic.findFirst({
+                select: {
+                    name: true,
+                    broker: {
+                        select: {
+                            url: true
+                        }
+                    }
+                },
+                where: {
+                    id: topic.id
+                }
+            });
+
             if (!validateResult) {
                 request.log.error(scriptValidate.errors);
                 return reply.badRequest(INVALID_SCRIPT);
+            } else if (!sink) {
+                request.log.error(`Topic ID ${topic.id} does not exists`);
+                return reply.badRequest(TOPIC_NOT_FOUND);
             }
+
+            sensorConfigIns.push({
+                broker: sink.broker.url,
+                topicName: sink.name,
+                interval: topic.interval,
+                script: filterAST
+            });
         } catch (err) {
             request.log.error(err);
             return reply.badRequest(INVALID_SCRIPT);
         }
     }
 
-    await prisma.$transaction([
-        prisma.sensorTopicConfig.deleteMany({
-            where: { sensorId }
-        }),
-        prisma.sensor.update({
-            data: {
-                name: payload.name,
-                remarks: payload.remarks,
-                topicConfigs: {
-                    createMany: {
-                        data: payload.subscribeTopics.map((item) => ({
-                            interval: item.interval,
-                            script: item.script,
-                            filterTemplateId: item.usingTemplateId,
-                            kafkaTopicId: item.id
-                        }))
+    try {
+        await sensorManager.sendConfig(sensorId, sensorConfigIns);
+        await prisma.$transaction([
+            prisma.sensorTopicConfig.deleteMany({
+                where: { sensorId }
+            }),
+            prisma.sensor.update({
+                data: {
+                    name: payload.name,
+                    remarks: payload.remarks,
+                    topicConfigs: {
+                        createMany: {
+                            data: payload.subscribeTopics.map((item) => ({
+                                interval: item.interval,
+                                script: item.script,
+                                filterTemplateId: item.usingTemplateId,
+                                kafkaTopicId: item.id
+                            }))
+                        }
                     }
-                }
-            },
-            where: { id: sensorId }
-        })
-    ]);
-    return sensorId;
+                },
+                where: { id: sensorId }
+            })
+        ]);
+        reply.send(sensorId);
+        return sensorId;
+    } catch (err) {
+        reply.internalServerError(err);
+        global.logger.error(`Fail to send config to sensor. Error message: ${err}`);
+    }
 }
 
 async function deleteSensor(request: FastifyRequest<{ Params: { sensorId: string } }>): Result<string> {

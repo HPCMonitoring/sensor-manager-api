@@ -81,7 +81,7 @@ class ScriptParser {
             );
     }
 
-    visitLikeCond(filters: RegexCondition) {
+    private visitLikeCond(filters: RegexCondition) {
         return Object.entries(filters)
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([k, v]) => `${LIKE_OP} ${k} "${v.like}"`);
