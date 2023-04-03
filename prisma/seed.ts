@@ -15,6 +15,10 @@ fields:
   pid: processId
   name: processName
   virtualMemoryUsage: RAM
+filters:
+  AND:
+  - pid: 10
+    uid: 999
 `;
 
 async function generateSampleData() {
