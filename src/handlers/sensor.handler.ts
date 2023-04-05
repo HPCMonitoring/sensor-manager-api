@@ -164,11 +164,10 @@ async function update(
                 where: { id: sensorId }
             })
         ]);
-        reply.send(sensorId);
-        return sensorId;
+        return reply.send(sensorId);
     } catch (err) {
-        reply.internalServerError(err);
         global.logger.error(`Fail to send config to sensor. Error message: ${err}`);
+        return reply.internalServerError(err);
     }
 }
 
