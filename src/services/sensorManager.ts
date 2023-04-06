@@ -1,6 +1,9 @@
+import { WSCloseCode, WsCmd, WSSensorCode, WS_COMMON_TIMEOUT } from "@constants";
 import { SocketStream } from "@fastify/websocket";
-import { WsMessage, WsMessageWrap } from "@interfaces";
+import { SensorConfig, WsConfigPayload, WsMessage, WsMessageWrap, WsTopicPayload } from "@interfaces";
 import { assert } from "console";
+import WebSocket from "ws";
+import { scriptParser } from "./sensorConfigParser";
 
 type PExecutor<T = unknown> = {
     resolve: (value: T | PromiseLike<T>) => void;
@@ -35,6 +38,7 @@ export class LiveSensor {
             global.logger.debug(`On message: id = ${this.id} and message = ${data.toString()}`);
             const messageWrap: WsMessageWrap<unknown> = JSON.parse(data.toString());
             this.reqResCb.get(messageWrap.coordId)?.resolve({ ...messageWrap });
+            this.reqResCb.delete(messageWrap.coordId);
         });
     }
 
@@ -45,10 +49,14 @@ export class LiveSensor {
             coordId: coordId
         };
 
-        this.connection.socket.send(JSON.stringify(sentData), (err) => {
-            if (err) {
-                this.reqResCb.get(coordId)?.reject(`Command: ${message.cmd} with coorId: ${coordId} send error`);
-            }
+        return new Promise<undefined>((resolve, reject) => {
+            this.connection.socket.send(JSON.stringify(sentData), (err) => {
+                if (err) {
+                    reject(`Command: ${message.cmd} with coorId: ${coordId} send error`);
+                } else {
+                    resolve(undefined);
+                }
+            });
         });
     }
 
@@ -75,10 +83,15 @@ export class LiveSensor {
         const timeoutPromise = new Promise<T>((_resolve, reject) => {
             setTimeout(() => {
                 reject(`Command: ${message.cmd} with coorId: ${coordId} receive response timeout`);
+                this.reqResCb.delete(coordId);
             }, timeout);
         });
 
         return Promise.race<T>([resPromise, timeoutPromise]);
+    }
+
+    close(code: WSCloseCode, message: string) {
+        this.connection.socket.close(code, message);
     }
 }
 
@@ -92,12 +105,36 @@ export class SensorManagerServer {
         this.liveSensors.set(liveSensor.id, liveSensor);
     }
 
-    getStatus(id: string): SensorConnectionStatus {
-        if (!this.liveSensors.has(id)) {
+    getStatus(sensorId: string): SensorConnectionStatus {
+        if (!this.liveSensors.has(sensorId)) {
             return "DISCONNECTED";
         }
-        const state = this.liveSensors.get(id)?.connection.socket.readyState;
-        return state === WebSocket.OPEN ? "CONNECTED" : "DISCONNECTED";
+        const state = this.liveSensors.get(sensorId)?.connection.socket.readyState;
+        return state === WebSocket.OPEN ? "RUNNING" : "DISCONNECTED";
+    }
+
+    sendConfig(sensorId: string, configs: SensorConfig[]) {
+        const topicPayloads: WsTopicPayload[] = configs.map((c) => ({
+            interval: c.interval,
+            broker: c.broker,
+            topicName: c.topicName,
+            type: c.script.type,
+            fields: c.script.fields as Record<string, string>,
+            prefixCommand: "filters" in c.script ? scriptParser.toPrefixCommand(c.script.filters) : ""
+        }));
+
+        const message: WsMessage<WsConfigPayload> = {
+            cmd: WsCmd.CONFIG,
+            message: "",
+            error: WSSensorCode.SUCCESS,
+            payload: {
+                topics: topicPayloads
+            }
+        };
+
+        const liveSensor = this.liveSensors.get(sensorId);
+        if (liveSensor) return liveSensor.sendReqRes(message, WS_COMMON_TIMEOUT);
+        else throw new Error(`Sensor with id = ${sensorId} has not registered to manager`);
     }
 }
 

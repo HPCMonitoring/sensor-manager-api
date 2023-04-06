@@ -10,18 +10,21 @@ const notEqExpr = s
     .maxProperties(4)
     .patternProperties({ "^(lt|lte|gt|gte)$": s.number() });
 
-const recursiveCondition = s
+export const equalCondition = s
     .object()
+    .id("#equalCondition")
     .minProperties(1)
-    .maxProperties(17)
     .additionalProperties(false)
     .prop("pid", s.number())
     .prop("parentPid", s.number())
     .prop("uid", s.number())
-    .prop("gid", s.number())
-    .prop("name", likeExpr)
-    .prop("executePath", likeExpr)
-    .prop("command", likeExpr)
+    .prop("gid", s.number());
+
+export const notEqualCondition = s
+    .object()
+    .id("#notEqualCondition")
+    .minProperties(1)
+    .additionalProperties(false)
     .prop("virtualMemoryUsage", notEqExpr)
     .prop("physicalMemoryUsage", notEqExpr)
     .prop("cpuTime", notEqExpr)
@@ -29,12 +32,24 @@ const recursiveCondition = s
     .prop("networkInBandwidth", notEqExpr)
     .prop("networkOutBandwidth", notEqExpr)
     .prop("ioRead", notEqExpr)
-    .prop("ioWrite", notEqExpr)
-    .prop("AND", s.oneOf([s.ref("#/oneOf/0/properties/filters"), s.array().minItems(1).items(s.ref("#/oneOf/0/properties/filters"))]))
-    .prop("OR", s.oneOf([s.ref("#/oneOf/0/properties/filters"), s.array().minItems(1).items(s.ref("#/oneOf/0/properties/filters"))]));
+    .prop("ioWrite", notEqExpr);
 
-const processScript = s
+export const likeCondition = s
     .object()
+    .id("#likeCondition")
+    .minProperties(1)
+    .additionalProperties(false)
+    .prop("name", likeExpr)
+    .prop("executePath", likeExpr)
+    .prop("command", likeExpr);
+
+export const recursiveCondition = s.object().anyOf([s.ref("#equalCondition"), s.ref("#notEqualCondition"), s.ref("#likeCondition")]);
+
+export const processScript = s
+    .object()
+    .definition("equalCondition", equalCondition)
+    .definition("notEqualCondition", notEqualCondition)
+    .definition("likeCondition", likeCondition)
     .prop("type", s.const("process").required())
     .prop(
         "fields",
@@ -60,9 +75,18 @@ const processScript = s
             .prop("ioRead", aliasName)
             .prop("ioWrite", aliasName)
     )
-    .prop("filters", recursiveCondition);
+    .prop(
+        "filters",
+        s
+            .object()
+            .additionalProperties(false)
+            .minProperties(1)
+            .required()
+            .prop("AND", s.array().minItems(1).items(recursiveCondition))
+            .prop("OR", s.array().minItems(1).items(recursiveCondition))
+    );
 
-const networkInterfaceScript = s
+export const networkInterfaceScript = s
     .object()
     .additionalProperties(false)
     .prop("type", s.const("network_interface").required())
@@ -79,7 +103,7 @@ const networkInterfaceScript = s
             .prop("outBandwidth", aliasName)
     );
 
-const memoryScript = s
+export const memoryScript = s
     .object()
     .additionalProperties(false)
     .prop("type", s.const("memory").required())
@@ -96,7 +120,7 @@ const memoryScript = s
             .prop("swapUsed", aliasName)
             .prop("swapFree", aliasName)
     );
-const cpuScript = s
+export const cpuScript = s
     .object()
     .additionalProperties(false)
     .prop("type", s.const("cpu").required())
@@ -115,7 +139,7 @@ const cpuScript = s
             .prop("steal", aliasName)
             .prop("idle", aliasName)
     );
-const ioScript = s
+export const ioScript = s
     .object()
     .additionalProperties(false)
     .prop("type", s.const("io").required())
@@ -131,7 +155,7 @@ const ioScript = s
             .prop("readPerSecond", aliasName)
             .prop("writePerSecond", aliasName)
     );
-const diskScript = s
+export const diskScript = s
     .object()
     .additionalProperties(false)
     .prop("type", s.const("disk").required())
@@ -148,4 +172,4 @@ const diskScript = s
             .prop("available", aliasName)
             .prop("mountedOn", aliasName)
     );
-export const scriptSchema = s.oneOf([processScript, networkInterfaceScript, memoryScript, cpuScript, ioScript, diskScript]);
+export const scriptSchema = s.anyOf([processScript, networkInterfaceScript, memoryScript, cpuScript, ioScript, diskScript]);
