@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: ["master"]
 
+env:
+  POSTGRES_URL: postgresql://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@sensormanagerdb:5432/${{ secrets.POSTGRES_DB }}?schema=public
+
 jobs:
   test:
     name: Test
@@ -33,6 +36,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
+
+      - name: Set up env file
+        run: |
+          echo > .env
+          echo POSTGRES_URL=${{ env.POSTGRES_URL }} > .env
+          echo COOKIE_SECRET=${{ secrets.COOKIE_SECRET }} >> .env
+          echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
+          echo CORS_WHITE_LIST=${{ vars.CORS_WHITE_LIST }} >> .env
 
       - name: Install dependencies
         run: yarn
