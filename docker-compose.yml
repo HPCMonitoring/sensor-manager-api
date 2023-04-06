@@ -21,14 +21,57 @@ services:
       dockerfile: ./Dockerfile
     image: ghcr.io/hpcmonitoring/sensor-manager-api:0.1.0
     container_name: hpcmonitoring_sensor-manager-api
-    environment:
-      - POSTGRES_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@sensormanagerdb:5432/${POSTGRES_DB}?schema=public
     networks:
       - sensor_manager_network
     ports:
       - 8080:8080
+    volumes:
+      - .env:/app/.env
     depends_on:
       - postgres
+    restart: always
+  
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - 3001:8080
+    networks:
+      - sensor_manager_network
+    environment:
+      DYNAMIC_CONFIG_ENABLED: "true"
+      KAFKA_CLUSTERS_0_NAME: Self-hosted broker
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
+    restart: always
+  
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    networks:
+      - sensor_manager_network
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    restart: always
+
+  broker:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: broker
+    hostname: kafka
+    ports:
+      - 9092:9092
+    networks:
+      - sensor_manager_network
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 
     restart: always
       
 volumes:
@@ -36,4 +79,3 @@ volumes:
 
 networks:
   sensor_manager_network:
-    driver: bridge
