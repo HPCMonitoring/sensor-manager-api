@@ -3,7 +3,7 @@ import type { FastifyCookieOptions } from "@fastify/cookie";
 import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 import { apiPlugin, authPlugin } from "./plugins";
 import { wQuerySchema } from "@dtos/in";
-import { kafkaAdmin } from "@services";
+// import { kafkaAdmin } from "@services";
 import { wSetupHandler } from "@handlers";
 
 export function createServer(config: ServerConfig) {
@@ -45,7 +45,7 @@ export function createServer(config: ServerConfig) {
 
     app.ready().then(() => {
         app.swagger({ yaml: true });
-        kafkaAdmin.connect().then(() => app.log.info("Kakfa admin connected"));
+        // kafkaAdmin.connect().then(() => app.log.info("Kakfa admin connected"));
         app.log.info(`Swagger documentation is on http://${config.host}:${config.port}/docs`);
     });
 
@@ -58,16 +58,17 @@ export function createServer(config: ServerConfig) {
             function (err) {
                 if (err) {
                     app.log.error(err);
-                    kafkaAdmin.disconnect().then(() => process.exit(1));
+                    // kafkaAdmin.disconnect().then(() => process.exit(1));
                 }
             }
         );
         process.on("SIGINT", () => {
-            app.log.info("Disconnect kafka admin ...");
-            kafkaAdmin.disconnect().then(() => {
-                app.log.info("Exited program");
-                process.exit(0);
-            });
+            // app.log.info("Disconnect kafka admin ...");
+            // kafkaAdmin.disconnect().then(() => {
+
+            // });
+            app.log.info("Exited program");
+            process.exit(0);
         });
     };
 
