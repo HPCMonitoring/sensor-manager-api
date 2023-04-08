@@ -5,8 +5,8 @@ import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
 import Ajv from "ajv";
 import yaml from "js-yaml";
-import { sensorManager } from "@services";
-import { SensorConfig } from "@interfaces";
+import { scriptParser, sensorManager } from "@services";
+import { WsTopicPayload } from "@interfaces";
 
 const ajv = new Ajv({ allErrors: false, strict: false });
 
@@ -98,7 +98,7 @@ async function update(
 ): Result<string> {
     const payload = request.body;
     const sensorId = request.params.sensorId;
-    const sensorConfigIns: SensorConfig[] = [];
+    const topicConfigs: WsTopicPayload[] = [];
 
     for (const topic of payload.subscribeTopics) {
         try {
@@ -128,11 +128,13 @@ async function update(
                 return reply.badRequest(TOPIC_NOT_FOUND);
             }
 
-            sensorConfigIns.push({
+            topicConfigs.push({
                 broker: sink.broker.url,
                 topicName: sink.name,
                 interval: topic.interval,
-                script: filterAST
+                type: filterAST.type,
+                fields: filterAST.fields as Record<string, string>,
+                prefixCommand: "filters" in filterAST ? scriptParser.toPrefixCommand(filterAST.filters) : ""
             });
         } catch (err) {
             request.log.error(err);
@@ -141,7 +143,7 @@ async function update(
     }
 
     try {
-        await sensorManager.sendConfig(sensorId, sensorConfigIns);
+        await sensorManager.sendConfig(sensorId, topicConfigs);
         await prisma.$transaction([
             prisma.sensorTopicConfig.deleteMany({
                 where: { sensorId }

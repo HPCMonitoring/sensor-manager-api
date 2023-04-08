@@ -1,9 +1,8 @@
 import { WSCloseCode, WsCmd, WSSensorCode, WS_COMMON_TIMEOUT } from "@constants";
 import { SocketStream } from "@fastify/websocket";
-import { SensorConfig, WsConfigPayload, WsMessage, WsMessageWrap, WsTopicPayload } from "@interfaces";
+import { WsConfigPayload, WsMessage, WsMessageWrap, WsTopicPayload } from "@interfaces";
 import { assert } from "console";
 import WebSocket from "ws";
-import { scriptParser } from "./sensorConfigParser";
 
 type PExecutor<T = unknown> = {
     resolve: (value: T | PromiseLike<T>) => void;
@@ -113,22 +112,13 @@ export class SensorManagerServer {
         return state === WebSocket.OPEN ? "RUNNING" : "DISCONNECTED";
     }
 
-    sendConfig(sensorId: string, configs: SensorConfig[]) {
-        const topicPayloads: WsTopicPayload[] = configs.map((c) => ({
-            interval: c.interval,
-            broker: c.broker,
-            topicName: c.topicName,
-            type: c.script.type,
-            fields: c.script.fields as Record<string, string>,
-            prefixCommand: "filters" in c.script ? scriptParser.toPrefixCommand(c.script.filters) : ""
-        }));
-
+    sendConfig(sensorId: string, configs: WsTopicPayload[]) {
         const message: WsMessage<WsConfigPayload> = {
             cmd: WsCmd.CONFIG,
             message: "",
             error: WSSensorCode.SUCCESS,
             payload: {
-                topics: topicPayloads
+                topics: configs
             }
         };
 
