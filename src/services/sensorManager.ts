@@ -29,7 +29,6 @@ export class LiveSensor {
 
     private setup() {
         this.connection.socket.on("ping", () => {
-            global.logger.info(`On ping sensor with id: ${this.id}`);
             this.lastPingTime = new Date();
         });
         this.connection.socket.on("message", (data) => {
@@ -64,7 +63,7 @@ export class LiveSensor {
 
         // TODO: need better approach to generate coordId in case of high load
         const coordId = `${message.cmd}_${this.sequenceNum++ % Math.pow(2, SEQUENCE_BITS)}`;
-        const resPromise = new Promise<T>((resolve, reject) => {
+        const resPromise = new Promise<WsMessage<T>>((resolve, reject) => {
             this.reqResCb.set(coordId, { resolve: resolve, reject: reject });
         });
 
@@ -79,14 +78,14 @@ export class LiveSensor {
             }
         });
 
-        const timeoutPromise = new Promise<T>((_resolve, reject) => {
+        const timeoutPromise = new Promise<WsMessage<T>>((_resolve, reject) => {
             setTimeout(() => {
                 reject(`Command: ${message.cmd} with coorId: ${coordId} receive response timeout`);
                 this.reqResCb.delete(coordId);
             }, timeout);
         });
 
-        return Promise.race<T>([resPromise, timeoutPromise]);
+        return Promise.race<WsMessage<T>>([resPromise, timeoutPromise]);
     }
 
     close(code: WSCloseCode, message: string) {

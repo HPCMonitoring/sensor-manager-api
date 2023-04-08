@@ -1,4 +1,4 @@
-import { WSCloseCode, WsCmd, WSSensorCode } from "@constants";
+import { WSCloseCode, WsCmd, WSSensorCode, WS_COMMON_TIMEOUT } from "@constants";
 import { W_UNAUTHORIZED, W_CLUSTER_NOT_EXIST, W_ID_NOT_EXIST, W_INTERVAL_SERVER, W_AUTHORIZED } from "@constants/wErrorMessages";
 import { SocketStream } from "@fastify/websocket";
 import { LiveSensor } from "@services";
@@ -8,6 +8,7 @@ import { WQueryString } from "@dtos/in";
 import { sensorManager } from "@services";
 import { FastifyRequest } from "fastify";
 import { WsMessage, WSAuthPayload, WsSysInfoPayload } from "@interfaces";
+import assert from "assert";
 
 const TEMP_PASSWORD = "hpc-monitoring-sensor";
 
@@ -115,8 +116,12 @@ export const wSetupHandler = async (connection: SocketStream, req: FastifyReques
                 payload: "{}"
             };
             try {
-                const sysInfo = await liveSensor.sendReqRes(sysInfoRequest, 1000);
+                const sysInfo = (await liveSensor.sendReqRes(sysInfoRequest, WS_COMMON_TIMEOUT)).payload;
+
+                assert(sysInfo !== "{}");
+
                 global.logger.debug(`Receive sys info: id = ${liveSensor.id}, message = ${JSON.stringify(sysInfo)}`);
+
                 await prisma.sensor.update({
                     data: {
                         kernelName: sysInfo.kernelName,
