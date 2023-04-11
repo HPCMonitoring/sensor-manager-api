@@ -43,22 +43,27 @@ export const likeCondition = s
     .prop("executePath", likeExpr)
     .prop("command", likeExpr);
 
-export const recursiveCondition = s.object().anyOf([s.ref("#equalCondition"), s.ref("#notEqualCondition"), s.ref("#likeCondition")]);
+export const fieldCondition = s
+    .object()
+    .minProperties(1)
+    .id("#fieldCondition")
+    .anyOf([s.ref("#equalCondition"), s.ref("#notEqualCondition"), s.ref("#likeCondition")]);
 
 export const processScript = s
     .object()
     .definition("equalCondition", equalCondition)
     .definition("notEqualCondition", notEqualCondition)
     .definition("likeCondition", likeCondition)
+    .definition("fieldCondition", fieldCondition)
     .prop("type", s.const("process").required())
     .prop(
         "fields",
         s
             .object()
+            .required()
             .additionalProperties(false)
             .minProperties(1)
             .maxProperties(15)
-            .required()
             .prop("pid", aliasName)
             .prop("parentPid", aliasName)
             .prop("uid", aliasName)
@@ -78,12 +83,15 @@ export const processScript = s
     .prop(
         "filters",
         s
-            .object()
-            .additionalProperties(false)
-            .minProperties(1)
-            .required()
-            .prop("AND", s.array().minItems(1).items(recursiveCondition))
-            .prop("OR", s.array().minItems(1).items(recursiveCondition))
+            .array()
+            .minItems(1)
+            .items(
+                s.anyOf([
+                    s.ref("#fieldCondition"),
+                    s.object().prop("AND", s.ref("#fieldCondition")),
+                    s.object().prop("OR", s.ref("#fieldCondition"))
+                ])
+            )
     );
 
 export const networkInterfaceScript = s

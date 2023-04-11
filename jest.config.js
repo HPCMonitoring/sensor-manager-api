@@ -34,7 +34,7 @@ module.exports = {
     testEnvironment: "node",
 
     // The glob patterns Jest uses to detect test files
-    testMatch: ["**/src/**/__tests__/**/*.[jt]s?(x)", "**/src/**/?(*.)+(spec|test).[tj]s?(x)"],
+    testMatch: ["**/test/*.[jt]s?(x)"],
     // A map from regular expressions to paths to transformers
     transform: {
         "\\.(ts)$": "ts-jest"
@@ -45,7 +45,8 @@ module.exports = {
         "@constants": "<rootDir>/src/constants",
         "@dtos/common": "<rootDir>/src/dtos/common.dto.ts",
         "@dtos/in": "<rootDir>/src/dtos/in",
-        "@dtos/out": "<rootDir>/src/dtos/out"
+        "@dtos/out": "<rootDir>/src/dtos/out",
+        "@utils": "<rootDir>/src/utils.ts"
     },
     roots: ["<rootDir>"],
     modulePaths: ["<rootDir>"],

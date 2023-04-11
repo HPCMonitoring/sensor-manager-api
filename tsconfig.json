@@ -47,7 +47,7 @@
             "@interfaces/*": ["src/interfaces/*"]
         }
     },
-    "include": ["src", "**/*.js", "**/*.ts"],
+    "include": ["src", "**/*.js", "**/*.ts", "test"],
     "exclude": ["node_modules", "dist", "coverage"],
     "linterOptions": {
         "exclude": []

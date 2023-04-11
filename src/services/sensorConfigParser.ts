@@ -6,9 +6,8 @@ const AND_OP = "&&";
 const OR_OP = "||";
 const EQ_OP = "==";
 const LIKE_OP = "%=";
-type NotEqOp = "<" | "<=" | ">" | ">=";
 
-const NotEqOpMap: Record<NotEqExpr, NotEqOp> = {
+const NotEqOpMap: Record<NotEqOp, NotEqExpr> = {
     lt: "<",
     lte: "<=",
     gt: ">",

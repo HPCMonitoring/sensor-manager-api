@@ -7,4 +7,5 @@ node_modules
 *.yml
 *.json
 *.md
+*.test.*
 coverage
