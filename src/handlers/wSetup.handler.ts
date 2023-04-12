@@ -7,7 +7,7 @@ import { prisma } from "@repositories";
 import { WQueryString } from "@dtos/in";
 import { sensorManager } from "@services";
 import { FastifyRequest } from "fastify";
-import { WsMessage, WSAuthPayload, WsSysInfoPayload } from "@interfaces";
+import { IWsMessage } from "@interfaces";
 
 const TEMP_PASSWORD = "hpc-monitoring-sensor";
 
@@ -30,7 +30,7 @@ const handleNewSensor = async (req: FastifyRequest<{ Querystring: WQueryString }
 };
 
 const doAuthSuccess = (liveSensor: LiveSensor) => {
-    const authMessage: WsMessage<WSAuthPayload> = {
+    const authMessage: IWsMessage<WSAuthPayload> = {
         cmd: WsCmd.AUTH,
         message: W_AUTHORIZED,
         error: WSSensorCode.SUCCESS,
@@ -45,7 +45,7 @@ const doAuthFail = (connection: SocketStream, message: string) => {
     // We create dumpLiveSensor here to use its sending method
     const dumpId = "UNDEFINED";
     const dumpLiveSensor = new LiveSensor(dumpId, connection);
-    const failMessage: WsMessage<WSAuthPayload> = {
+    const failMessage: IWsMessage<WSAuthPayload> = {
         cmd: WsCmd.AUTH,
         message: message,
         error: WSSensorCode.UNAUTHORIZED,
@@ -108,7 +108,7 @@ export const wSetupHandler = async (connection: SocketStream, req: FastifyReques
         if (liveSensor) {
             doAuthSuccess(liveSensor);
             sensorManager.onSensorConnect(liveSensor);
-            const sysInfoRequest: WsMessage<WsSysInfoPayload> = {
+            const sysInfoRequest: IWsMessage<WsSysInfoPayload> = {
                 cmd: WsCmd.SYS_INFO,
                 message: "",
                 error: WSSensorCode.SUCCESS,

@@ -19,15 +19,31 @@ type DiskField = "filesystem" | "used" | "available" | "mountedOn";
 
 type NotEqOp = "lt" | "lte" | "gt" | "gte";
 
+/**
+ * In runtime, each record has only one field.
+ */
 type PartialRecord<K extends string, V> = Partial<Record<K, V>>;
 
+/**
+ * In runtime, each record has only one field.
+ */
 type EqCondition = PartialRecord<ProcessEqField, number>;
+/**
+ * In runtime, each record has only one field.
+ */
 type NotEqCondition = PartialRecord<ProcessNotEqField, PartialRecord<NotEqOp, number>>;
+/**
+ * In runtime, each record has only one field.
+ */
 type RegexCondition = PartialRecord<ProcessRegexField, { like: string }>;
+
 type AndCondition = { AND?: Condition[] };
 type OrCondition = { OR?: Condition[] };
 
-type Condition = EqCondition & RegexCondition & NotEqCondition & AndCondition & OrCondition;
+/**
+ * In runtime, each record has only one field.
+ */
+type Condition = EqCondition | RegexCondition | NotEqCondition | AndCondition | OrCondition;
 
 type ProcessScriptAST = {
     type: "process";

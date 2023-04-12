@@ -1,5 +1,8 @@
 import { nullable } from "@dtos/common";
 import s from "fluent-json-schema";
+import Ajv from "ajv";
+
+const ajv = new Ajv({ allErrors: false, strict: false });
 
 const createLikeExpr = (property: ProcessRegexField) =>
     s
@@ -173,3 +176,4 @@ export const diskScript = s
             .prop("mountedOn", aliasName)
     );
 export const scriptSchema = s.oneOf([processScript, networkInterfaceScript, memoryScript, cpuScript, ioScript, diskScript]);
+export const validateConfigScript = ajv.compile(scriptSchema.valueOf());

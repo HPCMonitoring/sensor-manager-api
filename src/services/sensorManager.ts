@@ -1,9 +1,9 @@
 import { WSCloseCode, WsCmd, WSSensorCode, WS_COMMON_TIMEOUT } from "@constants";
 import { SocketStream } from "@fastify/websocket";
-import { SensorConfig, WsConfigPayload, WsMessage, WsMessageWrap, WsTopicPayload } from "@interfaces";
+import { IWsMessage, IWsMessageWrap } from "@interfaces";
 import { assert } from "console";
 import WebSocket from "ws";
-import { scriptParser } from "./sensorConfigParser";
+import { filterGenerator } from "./sensorConfigParser";
 
 type PExecutor<T = unknown> = {
     resolve: (value: T | PromiseLike<T>) => void;
@@ -36,15 +36,15 @@ export class LiveSensor {
         this.connection.socket.on("message", (data) => {
             // TODO: need validation here
             global.logger.debug(`On message: id = ${this.id} and message = ${data.toString()}`);
-            const messageWrap: WsMessageWrap<unknown> = JSON.parse(data.toString());
+            const messageWrap: IWsMessageWrap<unknown> = JSON.parse(data.toString());
             this.reqResCb.get(messageWrap.coordId)?.resolve({ ...messageWrap });
             this.reqResCb.delete(messageWrap.coordId);
         });
     }
 
-    send<T>(message: WsMessage<T>) {
+    send<T>(message: IWsMessage<T>) {
         const coordId = `${message.cmd}_${this.sequenceNum++ % Math.pow(2, SEQUENCE_BITS)}`;
-        const sentData: WsMessageWrap<T> = {
+        const sentData: IWsMessageWrap<T> = {
             ...message,
             coordId: coordId
         };
@@ -60,7 +60,7 @@ export class LiveSensor {
         });
     }
 
-    sendReqRes<T>(message: WsMessage<T>, timeout: number) {
+    sendReqRes<T>(message: IWsMessage<T>, timeout: number) {
         assert(timeout > 0);
 
         // TODO: need better approach to generate coordId in case of high load
@@ -69,7 +69,7 @@ export class LiveSensor {
             this.reqResCb.set(coordId, { resolve: resolve, reject: reject });
         });
 
-        const sentData: WsMessageWrap<T> = {
+        const sentData: IWsMessageWrap<T> = {
             ...message,
             coordId: coordId
         };
@@ -120,10 +120,10 @@ export class SensorManagerServer {
             topicName: c.topicName,
             type: c.script.type,
             fields: c.script.fields as Record<string, string>,
-            prefixCommand: "filters" in c.script ? scriptParser.toPrefixCommand(c.script.filters) : ""
+            prefixCommand: "filters" in c.script ? filterGenerator.toPrefix(c.script.filters) : ""
         }));
 
-        const message: WsMessage<WsConfigPayload> = {
+        const message: IWsMessage<WsConfigPayload> = {
             cmd: WsCmd.CONFIG,
             message: "",
             error: WSSensorCode.SUCCESS,
