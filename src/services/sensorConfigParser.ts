@@ -44,6 +44,8 @@ class FilterGenerator {
         if (!condition.AND) throw new Error(MISSING_STATIC_CHECK);
 
         const numOperand = condition.AND.length;
+        if (numOperand === 1) return this.visitCondition(condition.AND[0]);
+
         const operands = condition.AND.map((c) => this.visitCondition(c));
         return `${AND_OP} ${numOperand} ${operands.join(" ")}`;
     }
@@ -52,6 +54,8 @@ class FilterGenerator {
         if (!condition.OR) throw new Error(MISSING_STATIC_CHECK);
 
         const numOperand = condition.OR.length;
+        if (numOperand === 1) return this.visitCondition(condition.OR[0]);
+
         const operands = condition.OR.map((c) => this.visitCondition(c));
         return `${OR_OP} ${numOperand} ${operands.join(" ")}`;
     }
