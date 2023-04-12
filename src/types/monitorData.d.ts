@@ -32,7 +32,7 @@ type Condition = EqCondition & RegexCondition & NotEqCondition & AndCondition & 
 type ProcessScriptAST = {
     type: "process";
     fields: PartialRecord<ProcessField, string | null>;
-    filters?: AndCondition | OrCondition;
+    filters?: Condition[];
 };
 
 type NetworkInterfaceScriptAST = {

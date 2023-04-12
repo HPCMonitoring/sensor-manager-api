@@ -137,6 +137,22 @@ describe("Test yaml validation of process", () => {
     const ast = buildAST(yamlScript)
     expect(staticCheckConfig(ast, processScript)).toStrictEqual(true);
   });
+  test("Single not eq condition with additional properties", () => {
+    const yamlScript = `
+      type: process
+      fields:
+        pid:
+        gid:
+        virtualMemoryUsage:
+      filters:
+        - virtualMemoryUsage:
+            lte: 15
+            gte: 50
+            additionalProp: 145
+      `;
+    const ast = buildAST(yamlScript)
+    expect(staticCheckConfig(ast, processScript)).toStrictEqual(false);
+  });
   test("Combine relational conditions", () => {
     const yamlScript = `
     type: process
@@ -155,6 +171,44 @@ describe("Test yaml validation of process", () => {
     const ast = buildAST(yamlScript)
     expect(staticCheckConfig(ast, processScript)).toStrictEqual(true);
   });
+  
+  test("Filter with an item has RHS null", () => {
+    const yamlScript = `
+    type: process
+    fields:
+      pid: processID
+    filters:
+      - OR:
+        - pid: 1
+        - command:
+    `;
+    const ast = buildAST(yamlScript)
+    expect(staticCheckConfig(ast, processScript)).toStrictEqual(false);
+  });
+  test("Filter with an item has more than 1 field", () => {
+    const yamlScript = `
+    type: process
+    fields:
+      pid: processID
+    filters:
+      - pid: 1
+        command:
+    `;
+    const ast = buildAST(yamlScript)
+    expect(staticCheckConfig(ast, processScript)).toStrictEqual(false);
+  });
+  test("Filter with an item not in schema", () => {
+    const yamlScript = `
+    type: process
+    fields:
+      pid: processID
+    filters:
+      - Hello: 1
+    `;
+    const ast = buildAST(yamlScript)
+    expect(staticCheckConfig(ast, processScript)).toStrictEqual(false);
+  });
+
   test("AND condition", () => {
     const yamlScript = `
     type: process
@@ -287,7 +341,7 @@ describe("Test yaml validation of process", () => {
             - name:
                 like: "%helloworld%"
             - virtualMemoryUsage:
-                lte: 15
+                lte: 15 
                 gte: 50
       - cpuUsage:
           lte: 20
