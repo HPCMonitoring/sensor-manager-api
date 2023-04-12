@@ -1,91 +1,108 @@
-import { equalCondition, likeCondition, notEqualCondition } from "@dtos/in";
-import Ajv, { ValidateFunction } from "ajv";
-const ajv = new Ajv({ allErrors: false, strict: false });
+import { MISSING_STATIC_CHECK } from "@constants";
 
 const AND_OP = "&&";
 const OR_OP = "||";
 const EQ_OP = "==";
 const LIKE_OP = "%=";
-type NotEqOp = "<" | "<=" | ">" | ">=";
 
-const NotEqOpMap: Record<NotEqExpr, NotEqOp> = {
+const NotEqOpMap: Record<NotEqOp, NotEqExpr> = {
     lt: "<",
     lte: "<=",
     gt: ">",
     gte: ">="
 };
 
-class ScriptParser {
-    private equalCondValidator: ValidateFunction<unknown>;
-    private notEqCondValidator: ValidateFunction<unknown>;
-    private likeCondValidator: ValidateFunction<unknown>;
-    constructor() {
-        this.equalCondValidator = ajv.compile(equalCondition.valueOf());
-        this.notEqCondValidator = ajv.compile(notEqualCondition.valueOf());
-        this.likeCondValidator = ajv.compile(likeCondition.valueOf());
+class FilterGenerator {
+    private isEqCond(cond: Condition) {
+        return (["gid", "parentPid", "pid", "uid"] as ProcessEqField[]).some((field) => field in cond);
+    }
+    private isNotEqCond(cond: Condition) {
+        return (
+            [
+                "cpuTime",
+                "cpuUsage",
+                "ioRead",
+                "ioWrite",
+                "networkInBandwidth",
+                "networkOutBandwidth",
+                "physicalMemoryUsage",
+                "virtualMemoryUsage"
+            ] as ProcessNotEqField[]
+        ).some((field) => field in cond);
+    }
+    private isLikeCond(cond: Condition) {
+        return (["command", "executePath", "name"] as ProcessRegexField[]).some((field) => field in cond);
     }
 
-    toPrefixCommand(filters: AndCondition | OrCondition | undefined) {
-        if (!filters) {
-            throw new Error("Not implmented");
-        } else if ("AND" in filters) {
-            return this.visitAndCondition(filters as AndCondition);
-        } else {
-            return this.visitOrCondition(filters as OrCondition);
-        }
+    toPrefix(conds?: Condition[]) {
+        if (!conds) return "";
+        if (conds.length === 1) return this.visitCondition(conds[0]);
+        return this.visitAndCondition({ AND: conds });
     }
 
-    private visitAndCondition(filters: AndCondition) {
-        if (!filters.AND) {
-            throw new Error("Not implemented");
-        }
-        const numOperand = filters.AND.length;
-        const operands = filters.AND.map((c) => this.visitCondition(c));
-        return `${AND_OP} ${numOperand} ${operands}`;
+    private visitAndCondition(condition: AndCondition): string {
+        if (!condition.AND) throw new Error(MISSING_STATIC_CHECK);
+
+        const numOperand = condition.AND.length;
+        if (numOperand === 1) return this.visitCondition(condition.AND[0]);
+
+        const operands = condition.AND.map((c) => this.visitCondition(c));
+        return `${AND_OP} ${numOperand} ${operands.join(" ")}`;
     }
 
-    private visitOrCondition(filters: OrCondition) {
-        if (!filters.OR) {
-            throw new Error("Not implemented");
-        }
-        const numOperand = filters.OR.length;
-        const operands = filters.OR.map((c) => this.visitCondition(c));
-        return `${OR_OP} ${numOperand} ${operands}`;
+    private visitOrCondition(condition: OrCondition): string {
+        if (!condition.OR) throw new Error(MISSING_STATIC_CHECK);
+
+        const numOperand = condition.OR.length;
+        if (numOperand === 1) return this.visitCondition(condition.OR[0]);
+
+        const operands = condition.OR.map((c) => this.visitCondition(c));
+        return `${OR_OP} ${numOperand} ${operands.join(" ")}`;
     }
 
-    private visitCondition(filters: Condition) {
-        let expressions: string[] = [];
-        if (this.equalCondValidator(filters)) {
-            expressions = expressions.concat(this.visitEqCond(filters));
-        } else if (this.notEqCondValidator(filters)) {
-            expressions = expressions.concat(this.visitNotEqCond(filters));
-        } else if (this.likeCondValidator(filters)) {
-            expressions = expressions.concat(this.visitLikeCond(filters));
-        }
-        return `${AND_OP} ${expressions.length} ${expressions.join(" ")}`;
+    private visitCondition(cond: Condition): string {
+        if (this.isEqCond(cond)) return this.visitEqCond(cond as EqCondition);
+        else if (this.isNotEqCond(cond)) return this.visitNotEqCond(cond as NotEqCondition);
+        else if (this.isLikeCond(cond)) return this.visitLikeCond(cond as RegexCondition);
+        else if ("AND" in cond) return this.visitAndCondition(cond as AndCondition);
+        else if ("OR" in cond) return this.visitOrCondition(cond as OrCondition);
+
+        throw new Error(MISSING_STATIC_CHECK);
     }
 
-    private visitEqCond(filters: EqCondition) {
-        return Object.entries(filters)
+    private visitEqCond(cond: EqCondition): string {
+        const field = Object.keys(cond)[0] as ProcessEqField;
+        const value = cond[field];
+        if (!value) throw new Error(MISSING_STATIC_CHECK);
+
+        return `${EQ_OP} ${field} ${value}`;
+    }
+
+    private visitNotEqCond(cond: NotEqCondition): string {
+        const field = Object.keys(cond)[0] as ProcessNotEqField;
+        const value = cond[field];
+        if (!value) throw new Error(MISSING_STATIC_CHECK);
+
+        const exprs = Object.keys(value)
             .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([k, v]) => `${EQ_OP} ${k} ${v}`);
+            .map((key) => {
+                const op = key as NotEqOp;
+                const rhs = value[op];
+                if (!rhs) throw new Error(MISSING_STATIC_CHECK);
+
+                return `${NotEqOpMap[op]} ${field} ${value[op]}`;
+            });
+        if (exprs.length === 1) return exprs[0];
+        return `${AND_OP} ${exprs.length} ${exprs.join(" ")}`;
     }
 
-    private visitNotEqCond(filters: NotEqCondition) {
-        return Object.entries(filters)
-            .sort((a, b) => a[0].localeCompare(b[0]))
-            .flatMap(([k, v]) =>
-                Object.entries(v)
-                    .sort((a, b) => a[0].localeCompare(b[0]))
-                    .map(([k1, v1]) => `${NotEqOpMap[k1 as keyof typeof v]} ${k} ${v1}`)
-            );
-    }
+    private visitLikeCond(cond: RegexCondition): string {
+        const field = Object.keys(cond)[0] as ProcessRegexField;
+        const value = cond[field];
+        if (!value) throw new Error(MISSING_STATIC_CHECK);
 
-    private visitLikeCond(filters: RegexCondition) {
-        return Object.entries(filters)
-            .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([k, v]) => `${LIKE_OP} ${k} "${v.like}"`);
+        return `${LIKE_OP} ${field} "${value.like}"`;
     }
 }
 
-export const scriptParser = new ScriptParser();
+export const filterGenerator = new FilterGenerator();

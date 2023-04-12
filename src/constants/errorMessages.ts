@@ -12,3 +12,5 @@ export const CLUSTER_NOT_EXISTS = "Cluster not exists !";
 export const SENSOR_NOT_EXISTS = "Sensor not exists !";
 export const INVALID_SCRIPT = "Invalid script !";
 export const TOPIC_NOT_FOUND = "Topic not found !";
+
+export const MISSING_STATIC_CHECK = "Missing schema validation !";

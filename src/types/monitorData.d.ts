@@ -17,47 +17,63 @@ type CpuField = "user" | "nice" | "system" | "iowait" | "steal" | "idle";
 type IOField = "deviceName" | "readPerSecond" | "writePerSecond";
 type DiskField = "filesystem" | "used" | "available" | "mountedOn";
 
-type NotEqExpr = "lt" | "lte" | "gt" | "gte";
+type NotEqOp = "lt" | "lte" | "gt" | "gte";
 
+/**
+ * In runtime, each record has only one field.
+ */
 type PartialRecord<K extends string, V> = Partial<Record<K, V>>;
+
+/**
+ * In runtime, each record has only one field.
+ */
 type EqCondition = PartialRecord<ProcessEqField, number>;
-type NotEqCondition = PartialRecord<ProcessNotEqField, PartialRecord<NotEqExpr, number>>;
+/**
+ * In runtime, each record has only one field.
+ */
+type NotEqCondition = PartialRecord<ProcessNotEqField, PartialRecord<NotEqOp, number>>;
+/**
+ * In runtime, each record has only one field.
+ */
 type RegexCondition = PartialRecord<ProcessRegexField, { like: string }>;
+
 type AndCondition = { AND?: Condition[] };
 type OrCondition = { OR?: Condition[] };
 
-type Condition = EqCondition & RegexCondition & NotEqCondition & AndCondition & OrCondition;
+/**
+ * In runtime, each record has only one field.
+ */
+type Condition = EqCondition | RegexCondition | NotEqCondition | AndCondition | OrCondition;
 
-type Enumerable<T> = T | T[];
-type ProcessScript = {
+type ProcessScriptAST = {
     type: "process";
     fields: PartialRecord<ProcessField, string | null>;
-    filters?: AndCondition | OrCondition;
+    filters?: Condition[];
 };
 
-type NetworkInterfaceScript = {
+type NetworkInterfaceScriptAST = {
     type: "network_interface";
     fields: PartialRecord<NetworkInterfaceField, string | null>;
 };
 
-type MemScript = {
+type MemScriptAST = {
     type: "memory";
     fields: PartialRecord<MemoryField, string | null>;
 };
 
-type CpuScript = {
+type CpuScriptAST = {
     type: "cpu";
     fields: PartialRecord<CpuField, string | null>;
 };
 
-type IOScript = {
+type IOScriptAST = {
     type: "io";
     fields: PartialRecord<IOField, string | null>;
 };
 
-type DiskScript = {
+type DiskScriptAST = {
     type: "disk";
     fields: PartialRecord<DiskField, string | null>;
 };
 
-type ConfigScriptAST = ProcessScript | NetworkInterfaceScript | MemScript | CpuScript | IOScript | DiskScript;
+type ConfigScriptAST = ProcessScriptAST | NetworkInterfaceScriptAST | MemScriptAST | CpuScriptAST | IOScriptAST | DiskScriptAST;

@@ -1,64 +1,62 @@
 import { nullable } from "@dtos/common";
 import s from "fluent-json-schema";
+import Ajv from "ajv";
+
+const ajv = new Ajv({ allErrors: false, strict: false });
+
+const createLikeExpr = (property: ProcessRegexField) =>
+    s
+        .object()
+        .additionalProperties(false)
+        .prop(property, s.object().required().additionalProperties(false).prop("like", s.string().required()));
+const createNotEqExpr = (property: ProcessNotEqField) =>
+    s
+        .object()
+        .additionalProperties(false)
+        .prop(
+            property,
+            s
+                .object()
+                .required()
+                .additionalProperties(false)
+                .minProperties(1)
+                .maxProperties(4)
+                .prop("lt", s.number())
+                .prop("lte", s.number())
+                .prop("gt", s.number())
+                .prop("gte", s.number())
+        );
+const createEqExpr = (property: ProcessEqField) => s.object().additionalProperties(false).prop(property, s.number().required());
 
 const aliasName = s.string().raw(nullable);
-const likeExpr = s.object().additionalProperties(false).prop("like", s.string().required());
-const notEqExpr = s
-    .object()
-    .additionalProperties(false)
-    .minProperties(1)
-    .maxProperties(4)
-    .patternProperties({ "^(lt|lte|gt|gte)$": s.number() });
+const equalConditions = (["pid", "uid", "parentPid", "gid"] as ProcessEqField[]).map((prop) => createEqExpr(prop));
+const notEqualConditions = (
+    [
+        "cpuTime",
+        "cpuUsage",
+        "ioRead",
+        "ioWrite",
+        "networkInBandwidth",
+        "networkOutBandwidth",
+        "physicalMemoryUsage",
+        "virtualMemoryUsage"
+    ] as ProcessNotEqField[]
+).map((prop) => createNotEqExpr(prop));
+const likeConditions = (["command", "executePath", "name"] as ProcessRegexField[]).map((prop) => createLikeExpr(prop));
 
-export const equalCondition = s
-    .object()
-    .id("#equalCondition")
-    .minProperties(1)
-    .additionalProperties(false)
-    .prop("pid", s.number())
-    .prop("parentPid", s.number())
-    .prop("uid", s.number())
-    .prop("gid", s.number());
-
-export const notEqualCondition = s
-    .object()
-    .id("#notEqualCondition")
-    .minProperties(1)
-    .additionalProperties(false)
-    .prop("virtualMemoryUsage", notEqExpr)
-    .prop("physicalMemoryUsage", notEqExpr)
-    .prop("cpuTime", notEqExpr)
-    .prop("cpuUsage", notEqExpr)
-    .prop("networkInBandwidth", notEqExpr)
-    .prop("networkOutBandwidth", notEqExpr)
-    .prop("ioRead", notEqExpr)
-    .prop("ioWrite", notEqExpr);
-
-export const likeCondition = s
-    .object()
-    .id("#likeCondition")
-    .minProperties(1)
-    .additionalProperties(false)
-    .prop("name", likeExpr)
-    .prop("executePath", likeExpr)
-    .prop("command", likeExpr);
-
-export const recursiveCondition = s.object().anyOf([s.ref("#equalCondition"), s.ref("#notEqualCondition"), s.ref("#likeCondition")]);
+export const fieldConditions = [...equalConditions, ...notEqualConditions, ...likeConditions];
 
 export const processScript = s
     .object()
-    .definition("equalCondition", equalCondition)
-    .definition("notEqualCondition", notEqualCondition)
-    .definition("likeCondition", likeCondition)
     .prop("type", s.const("process").required())
     .prop(
         "fields",
         s
             .object()
+            .required()
             .additionalProperties(false)
             .minProperties(1)
             .maxProperties(15)
-            .required()
             .prop("pid", aliasName)
             .prop("parentPid", aliasName)
             .prop("uid", aliasName)
@@ -75,16 +73,21 @@ export const processScript = s
             .prop("ioRead", aliasName)
             .prop("ioWrite", aliasName)
     )
-    .prop(
+    .definition(
         "filters",
         s
-            .object()
-            .additionalProperties(false)
-            .minProperties(1)
-            .required()
-            .prop("AND", s.array().minItems(1).items(recursiveCondition))
-            .prop("OR", s.array().minItems(1).items(recursiveCondition))
-    );
+            .array()
+            .id("#filters")
+            .minItems(1)
+            .items(
+                s.oneOf([
+                    ...fieldConditions,
+                    s.object().additionalProperties(false).prop("AND", s.ref("#filters")),
+                    s.object().additionalProperties(false).prop("OR", s.ref("#filters"))
+                ])
+            )
+    )
+    .prop("filters", s.ref("#filters"));
 
 export const networkInterfaceScript = s
     .object()
@@ -172,4 +175,5 @@ export const diskScript = s
             .prop("available", aliasName)
             .prop("mountedOn", aliasName)
     );
-export const scriptSchema = s.anyOf([processScript, networkInterfaceScript, memoryScript, cpuScript, ioScript, diskScript]);
+export const scriptSchema = s.oneOf([processScript, networkInterfaceScript, memoryScript, cpuScript, ioScript, diskScript]);
+export const validateConfigScript = ajv.compile(scriptSchema.valueOf());

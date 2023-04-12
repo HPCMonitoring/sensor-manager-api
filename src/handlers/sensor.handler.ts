@@ -1,16 +1,16 @@
 import { INVALID_SCRIPT, SENSOR_NOT_EXISTS, TOPIC_NOT_FOUND } from "@constants";
 import { prisma } from "@repositories";
-import { scriptSchema, UpdateSensorDto } from "@dtos/in";
+import { UpdateSensorDto, validateConfigScript } from "@dtos/in";
 import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
-import Ajv from "ajv";
-import yaml from "js-yaml";
 import { sensorManager } from "@services";
-import { SensorConfig } from "@interfaces";
+import yaml from "js-yaml";
 
-const ajv = new Ajv({ allErrors: false, strict: false });
-
-async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<SensorSummaryDto[]> {
+async function getByClusterId(
+    request: FastifyRequest<{
+        Querystring: { clusterId: string };
+    }>
+): Result<SensorSummaryDto[]> {
     const sensors = await prisma.sensor.findMany({
         select: {
             id: true,
@@ -103,8 +103,7 @@ async function update(
     for (const topic of payload.subscribeTopics) {
         try {
             const filterAST = yaml.load(topic.script.replaceAll("\t", "  ")) as ConfigScriptAST;
-            const scriptValidate = ajv.compile(scriptSchema.valueOf());
-            const validateResult = scriptValidate(filterAST);
+            const validateResult = validateConfigScript(filterAST);
 
             const sink = await prisma.kafkaTopic.findFirst({
                 select: {
@@ -121,7 +120,7 @@ async function update(
             });
 
             if (!validateResult) {
-                request.log.error(scriptValidate.errors);
+                request.log.error(validateConfigScript.errors);
                 return reply.badRequest(INVALID_SCRIPT);
             } else if (!sink) {
                 request.log.error(`Topic ID ${topic.id} does not exists`);
