@@ -40,14 +40,14 @@ async function generateSampleData() {
 
     const broker = await prisma.kafkaBroker.create({
         data: {
-            url: "http://localhost:9092",
+            url: "localhost:9092",
             name: "Localhost"
         }
     });
 
     await prisma.kafkaBroker.create({
         data: {
-            url: "https://hpcc.hcmut.edu.vn",
+            url: "hpcc.hcmut.edu.vn",
             name: "HPCC",
             topics: {
                 createMany: {
