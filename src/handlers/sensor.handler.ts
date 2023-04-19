@@ -1,4 +1,4 @@
-import { INVALID_SCRIPT, SENSOR_NOT_EXISTS, TOPIC_NOT_FOUND } from "@constants";
+import { INVALID_SCRIPT, SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
 import { UpdateSensorDto, validateConfigScript } from "@dtos/in";
 import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
@@ -42,16 +42,11 @@ async function getById(
             arch: true,
             hostname: true,
             rootUser: true,
-            topicConfigs: {
+            jobs: {
                 select: {
                     id: true,
-                    kafkaTopic: {
-                        select: {
-                            id: true,
-                            name: true,
-                            broker: { select: { id: true, name: true, url: true } }
-                        }
-                    },
+                    topicName: true,
+                    brokerUrl: true,
                     usingTemplate: {
                         select: { id: true, name: true }
                     },
@@ -77,14 +72,13 @@ async function getById(
         hostname: sensor.hostname,
         rootUser: sensor.rootUser,
         state: sensorManager.getStatus(sensor.id),
-        subscribeTopics: sensor.topicConfigs.map((topicConfig) => ({
-            key: topicConfig.id,
-            id: topicConfig.kafkaTopic.id,
-            name: topicConfig.kafkaTopic.name,
-            interval: topicConfig.interval,
-            script: topicConfig.script,
-            broker: topicConfig.kafkaTopic.broker,
-            usingTemplate: topicConfig.usingTemplate
+        kafkaJobs: sensor.jobs.map((job) => ({
+            id: job.id,
+            topicName: job.topicName,
+            brokerUrl: job.brokerUrl,
+            interval: job.interval,
+            script: job.script,
+            usingTemplate: job.usingTemplate
         }))
     };
 }
@@ -100,37 +94,19 @@ async function update(
     const sensorId = request.params.sensorId;
     const sensorConfigIns: SensorConfig[] = [];
 
-    for (const topic of payload.subscribeTopics) {
+    for (const kafkaJob of payload.kafkaJobs) {
         try {
-            const filterAST = yaml.load(topic.script.replaceAll("\t", "  ")) as ConfigScriptAST;
+            const filterAST = yaml.load(kafkaJob.script.replaceAll("\t", "  ")) as ConfigScriptAST;
             const validateResult = validateConfigScript(filterAST);
-
-            const sink = await prisma.kafkaTopic.findFirst({
-                select: {
-                    name: true,
-                    broker: {
-                        select: {
-                            url: true
-                        }
-                    }
-                },
-                where: {
-                    id: topic.id
-                }
-            });
 
             if (!validateResult) {
                 request.log.error(validateConfigScript.errors);
                 return reply.badRequest(INVALID_SCRIPT);
-            } else if (!sink) {
-                request.log.error(`Topic ID ${topic.id} does not exists`);
-                return reply.badRequest(TOPIC_NOT_FOUND);
             }
-
             sensorConfigIns.push({
-                broker: sink.broker.url,
-                topicName: sink.name,
-                interval: topic.interval,
+                broker: kafkaJob.brokerUrl,
+                topicName: kafkaJob.topicName,
+                interval: kafkaJob.interval,
                 script: filterAST
             });
         } catch (err) {
@@ -142,20 +118,19 @@ async function update(
     try {
         await sensorManager.sendConfig(sensorId, sensorConfigIns);
         await prisma.$transaction([
-            prisma.sensorTopicConfig.deleteMany({
-                where: { sensorId }
-            }),
+            prisma.sensorKafkaJob.deleteMany({ where: { sensorId } }),
             prisma.sensor.update({
                 data: {
                     name: payload.name,
                     remarks: payload.remarks,
-                    topicConfigs: {
+                    jobs: {
                         createMany: {
-                            data: payload.subscribeTopics.map((item) => ({
+                            data: payload.kafkaJobs.map((item) => ({
+                                topicName: item.topicName,
+                                brokerUrl: item.brokerUrl,
                                 interval: item.interval,
                                 script: item.script,
-                                filterTemplateId: item.usingTemplateId,
-                                kafkaTopicId: item.id
+                                filterTemplateId: item.usingTemplateId
                             }))
                         }
                     }
