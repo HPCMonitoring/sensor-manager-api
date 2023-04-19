@@ -15,27 +15,27 @@ describe("sensor process script filter parser module", () => {
 
   test("Test not equal filter only", () => {
     const filters: Condition[] = [
-      { ioRead: { lt: 90 } },
-      { ioWrite: { lt: 90 } }
+      { readKBs: { lt: 90 } },
+      { writeKBs: { lt: 90 } }
     ];
 
     const prefixFilter = filterGenerator.toPrefix(filters);
-    expect(prefixFilter).toBe("&& 2 < ioRead 90 < ioWrite 90");
+    expect(prefixFilter).toBe("&& 2 < readKBs 90 < writeKBs 90");
   });
 
   test("Test not equal filter only", () => {
     const filters: Condition[] = [
-      { ioRead: { lt: 45 } },
+      { readKBs: { lt: 45 } },
       {
         OR: [
-          { ioWrite: { lt: 90 } },
+          { writeKBs: { lt: 90 } },
           { parentPid: 15 }
         ]
       }
     ];
 
     const prefixFilter = filterGenerator.toPrefix(filters);
-    expect(prefixFilter).toBe("&& 2 < ioRead 45 || 2 < ioWrite 90 == parentPid 15");
+    expect(prefixFilter).toBe("&& 2 < readKBs 45 || 2 < writeKBs 90 == parentPid 15");
   });
 
   test("Test regex filter only", () => {
@@ -71,10 +71,10 @@ describe("sensor process script filter parser module", () => {
       { executePath: { like: "/usr/bin/python3" } },
       { pid: 5 },
       { gid: 5 },
-      { virtualMemoryUsage: { gt: 20 } }
+      { virtualMemory: { gt: 20 } }
     ];
     const prefixFilter = filterGenerator.toPrefix(filters);
-    expect(prefixFilter).toBe(`&& 4 %= executePath "/usr/bin/python3" == pid 5 == gid 5 > virtualMemoryUsage 20`);
+    expect(prefixFilter).toBe(`&& 4 %= executePath "/usr/bin/python3" == pid 5 == gid 5 > virtualMemory 20`);
   })
 
   test("Test multiple conditions with AND & OR", () => {
@@ -88,12 +88,12 @@ describe("sensor process script filter parser module", () => {
       {
         OR: [
           { gid: 5 },
-          { virtualMemoryUsage: { gt: 20 } }
+          { virtualMemory: { gt: 20 } }
         ]
       }
     ];
     const prefixFilter = filterGenerator.toPrefix(filters);
-    expect(prefixFilter).toBe(`&& 2 && 2 %= executePath "/usr/bin/python3" == pid 5 || 2 == gid 5 > virtualMemoryUsage 20`);
+    expect(prefixFilter).toBe(`&& 2 && 2 %= executePath "/usr/bin/python3" == pid 5 || 2 == gid 5 > virtualMemory 20`);
   })
 
   test("Test a nested condition", () => {
@@ -101,18 +101,18 @@ describe("sensor process script filter parser module", () => {
       {
         OR: [
           { gid: 5 },
-          { virtualMemoryUsage: { gt: 20 } },
+          { virtualMemory: { gt: 20 } },
           {
             AND: [
               { executePath: { like: "%matlab%" } },
               { pid: 5 },
-              { OR: [{ ioRead: { lt: 50 } }] }
+              { OR: [{ readKBs: { lt: 50 } }] }
             ]
           }
         ]
       }
     ];
     const prefixFilter = filterGenerator.toPrefix(filters);
-    expect(prefixFilter).toBe(`|| 3 == gid 5 > virtualMemoryUsage 20 && 3 %= executePath "%matlab%" == pid 5 < ioRead 50`);
+    expect(prefixFilter).toBe(`|| 3 == gid 5 > virtualMemory 20 && 3 %= executePath "%matlab%" == pid 5 < readKBs 50`);
   })
 });

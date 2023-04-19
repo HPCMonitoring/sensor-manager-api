@@ -1,21 +1,21 @@
 type ProcessEqField = "pid" | "parentPid" | "uid" | "gid";
 type ProcessRegexField = "name" | "executePath" | "command";
 type ProcessNotEqField =
-    | "virtualMemoryUsage"
-    | "physicalMemoryUsage"
+    | "virtualMemory"
+    | "physicalMemory"
     | "cpuTime"
     | "cpuUsage"
     | "networkInBandwidth"
     | "networkOutBandwidth"
-    | "ioWrite"
-    | "ioRead";
+    | "writeKBs"
+    | "readKBs";
 type ProcessField = ProcessEqField | ProcessRegexField | ProcessNotEqField;
 
-type NetworkInterfaceField = "name" | "inBandwidth" | "outBandwidth";
-type MemoryField = "used" | "available" | "swapUsed" | "swapFree";
-type CpuField = "user" | "nice" | "system" | "iowait" | "steal" | "idle";
-type IOField = "deviceName" | "readPerSecond" | "writePerSecond";
-type DiskField = "filesystem" | "used" | "available" | "mountedOn";
+type NetworkInterfaceField = "name" | "receive" | "transmit";
+type MemoryField = "total" | "free" | "available" | "buffers" | "cached" | "swapTotal" | "swapFree" | "swapCached";
+type CpuField = "order" | "user" | "nice" | "system" | "idle" | "iowait" | "irq" | "softirq" | "steal" | "guest" | "guestNice";
+type IOField = "device" | "tps" | "readPerSec" | "read" | "writePerSec" | "write" | "discardPerSec" | "discard";
+type DiskField = "filesystem" | "size" | "used" | "available" | "usedPercentage" | "mountedOn";
 
 type NotEqOp = "lt" | "lte" | "gt" | "gte";
 

@@ -34,12 +34,12 @@ const notEqualConditions = (
     [
         "cpuTime",
         "cpuUsage",
-        "ioRead",
-        "ioWrite",
+        "readKBs",
+        "writeKBs",
         "networkInBandwidth",
         "networkOutBandwidth",
-        "physicalMemoryUsage",
-        "virtualMemoryUsage"
+        "physicalMemory",
+        "virtualMemory"
     ] as ProcessNotEqField[]
 ).map((prop) => createNotEqExpr(prop));
 const likeConditions = (["command", "executePath", "name"] as ProcessRegexField[]).map((prop) => createLikeExpr(prop));
@@ -64,14 +64,14 @@ export const processScript = s
             .prop("name", aliasName)
             .prop("executePath", aliasName)
             .prop("command", aliasName)
-            .prop("virtualMemoryUsage", aliasName)
-            .prop("physicalMemoryUsage", aliasName)
+            .prop("virtualMemory", aliasName)
+            .prop("physicalMemory", aliasName)
             .prop("cpuTime", aliasName)
             .prop("cpuUsage", aliasName)
             .prop("networkInBandwidth", aliasName)
             .prop("networkOutBandwidth", aliasName)
-            .prop("ioRead", aliasName)
-            .prop("ioWrite", aliasName)
+            .prop("readKBs", aliasName)
+            .prop("writeKBs", aliasName)
     )
     .definition(
         "filters",
@@ -102,8 +102,8 @@ export const networkInterfaceScript = s
             .maxProperties(3)
             .additionalProperties(false)
             .prop("name", aliasName)
-            .prop("inBandwidth", aliasName)
-            .prop("outBandwidth", aliasName)
+            .prop("receive", aliasName)
+            .prop("transmit", aliasName)
     );
 
 export const memoryScript = s
@@ -116,12 +116,16 @@ export const memoryScript = s
             .object()
             .required()
             .minProperties(1)
-            .maxProperties(4)
+            .maxProperties(8)
             .additionalProperties(false)
-            .prop("used", aliasName)
+            .prop("total", aliasName)
+            .prop("free", aliasName)
             .prop("available", aliasName)
-            .prop("swapUsed", aliasName)
+            .prop("buffers", aliasName)
+            .prop("cached", aliasName)
+            .prop("swapTotal", aliasName)
             .prop("swapFree", aliasName)
+            .prop("swapCached", aliasName)
     );
 export const cpuScript = s
     .object()
@@ -134,13 +138,18 @@ export const cpuScript = s
             .required()
             .additionalProperties(false)
             .minProperties(1)
-            .maxProperties(6)
+            .maxProperties(11)
+            .prop("order", aliasName)
             .prop("user", aliasName)
             .prop("nice", aliasName)
             .prop("system", aliasName)
-            .prop("iowait", aliasName)
-            .prop("steal", aliasName)
             .prop("idle", aliasName)
+            .prop("iowait", aliasName)
+            .prop("irq", aliasName)
+            .prop("softirq", aliasName)
+            .prop("steal", aliasName)
+            .prop("guest", aliasName)
+            .prop("guestNice", aliasName)
     );
 export const ioScript = s
     .object()
@@ -153,10 +162,15 @@ export const ioScript = s
             .required()
             .additionalProperties(false)
             .minProperties(1)
-            .maxProperties(3)
-            .prop("deviceName", aliasName)
-            .prop("readPerSecond", aliasName)
-            .prop("writePerSecond", aliasName)
+            .maxProperties(8)
+            .prop("device", aliasName)
+            .prop("tps", aliasName)
+            .prop("readPerSec", aliasName)
+            .prop("read", aliasName)
+            .prop("writePerSec", aliasName)
+            .prop("write", aliasName)
+            .prop("discardPerSec", aliasName)
+            .prop("discard", aliasName)
     );
 export const diskScript = s
     .object()
@@ -169,10 +183,11 @@ export const diskScript = s
             .required()
             .minProperties(1)
             .maxProperties(4)
-            .additionalProperties(false)
             .prop("filesystem", aliasName)
+            .prop("size", aliasName)
             .prop("used", aliasName)
             .prop("available", aliasName)
+            .prop("usedPercentage", aliasName)
             .prop("mountedOn", aliasName)
     );
 export const scriptSchema = s.oneOf([processScript, networkInterfaceScript, memoryScript, cpuScript, ioScript, diskScript]);
