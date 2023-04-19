@@ -26,8 +26,7 @@ const kafkaJobSchema = s
     .prop("topicName", s.string())
     .prop("interval", s.number())
     .prop("script", s.string())
-    .prop("usingTemplate", s.object().raw(nullable).prop("id", idSchema).prop("name", s.string()))
-    .prop("broker", s.object().prop("id", idSchema).prop("name", s.string()).prop("url", s.string()));
+    .prop("usingTemplate", s.object().raw(nullable).prop("id", idSchema).prop("name", s.string()));
 
 type KafkaJobDto = {
     id: string;
