@@ -21,12 +21,12 @@ class FilterGenerator {
             [
                 "cpuTime",
                 "cpuUsage",
-                "ioRead",
-                "ioWrite",
+                "readKBs",
+                "writeKBs",
                 "networkInBandwidth",
                 "networkOutBandwidth",
-                "physicalMemoryUsage",
-                "virtualMemoryUsage"
+                "physicalMemory",
+                "virtualMemory"
             ] as ProcessNotEqField[]
         ).some((field) => field in cond);
     }

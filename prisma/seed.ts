@@ -14,7 +14,7 @@ type: process
 fields:
   pid: processId
   name: processName
-  virtualMemoryUsage: RAM
+  virtualMemory: RAM
 filters:
   AND:
     - pid: 1

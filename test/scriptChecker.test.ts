@@ -7,8 +7,8 @@ describe("Test yaml validation of all datatype which is not process", () => {
         type: network_interface
         fields:
           name: iname
-          inBandwidth: in
-          outBandwidth: out
+          receive: in
+          transmit: out
         `;
     const ast = buildAST(yamlScript)
     expect(staticCheckConfig(ast, networkInterfaceScript)).toStrictEqual(true);
@@ -17,8 +17,8 @@ describe("Test yaml validation of all datatype which is not process", () => {
     const yamlScript = `
         type: memory
         fields:
-          available: iname
-          used: in
+          available: ableToUsed
+          free:
         `;
     const ast = buildAST(yamlScript)
     expect(staticCheckConfig(ast, memoryScript)).toStrictEqual(true);
@@ -27,9 +27,9 @@ describe("Test yaml validation of all datatype which is not process", () => {
     const yamlScript = `
         type: io
         fields:
-          readPerSecond: rps
-          writePerSecond: wps
-          deviceName: device
+          readPerSec: rps
+          writePerSec: wps
+          device: dname
         `;
     const ast = buildAST(yamlScript)
     expect(staticCheckConfig(ast, ioScript)).toStrictEqual(true);
@@ -64,7 +64,7 @@ describe("Test yaml validation of process", () => {
         fields:
           pid:
           gid:
-          virtualMemoryUsage:
+          virtualMemory:
         `;
     const ast = buildAST(yamlScript)
     expect(staticCheckConfig(ast, processScript)).toStrictEqual(true);
@@ -128,9 +128,9 @@ describe("Test yaml validation of process", () => {
       fields:
         pid:
         gid:
-        virtualMemoryUsage:
+        virtualMemory:
       filters:
-        - virtualMemoryUsage:
+        - virtualMemory:
             lte: 15
             gte: 50
       `;
@@ -143,9 +143,9 @@ describe("Test yaml validation of process", () => {
       fields:
         pid:
         gid:
-        virtualMemoryUsage:
+        virtualMemory:
       filters:
-        - virtualMemoryUsage:
+        - virtualMemory:
             lte: 15
             gte: 50
             additionalProp: 145
@@ -159,12 +159,12 @@ describe("Test yaml validation of process", () => {
     fields:
       pid:
       gid:
-      virtualMemoryUsage:
+      virtualMemory:
     filters:
       - gid: 5
       - name:
           like: "%helloworld%"
-      - virtualMemoryUsage:
+      - virtualMemory:
           lte: 15
           gte: 50
     `;
@@ -215,13 +215,13 @@ describe("Test yaml validation of process", () => {
     fields:
       pid:
       gid:
-      virtualMemoryUsage:
+      virtualMemory:
     filters:
       - AND:
         - gid: 5
         - name:
             like: "%helloworld%"
-        - virtualMemoryUsage:
+        - virtualMemory:
             lte: 15
             gte: 50
     `;
@@ -234,13 +234,13 @@ describe("Test yaml validation of process", () => {
     fields:
       pid:
       gid:
-      virtualMemoryUsage:
+      virtualMemory:
     filters:
       - OR:
         - gid: 5
         - name:
             like: "%helloworld%"
-        - virtualMemoryUsage:
+        - virtualMemory:
             lte: 15
             gte: 50
     `;
@@ -256,21 +256,21 @@ describe("Test yaml validation of process", () => {
       - gid: 5
       - name:
           like: "%helloworld%"
-      - virtualMemoryUsage:
+      - virtualMemory:
           lte: 15
           gte: 50
       - AND:
         - gid: 5
         - name:
             like: "%helloworld%"
-        - virtualMemoryUsage:
+        - virtualMemory:
             lte: 15
             gte: 50
       - OR:
         - gid: 5
         - name:
             like: "%helloworld%"
-        - virtualMemoryUsage:
+        - virtualMemory:
             lte: 15
             gte: 50
     `;
@@ -284,7 +284,7 @@ describe("Test yaml validation of process", () => {
         { gid: 5 },
         { name: { like: "%helloworld%" } },
         {
-          virtualMemoryUsage: {
+          virtualMemory: {
             lte: 15,
             gte: 50
           }
@@ -294,7 +294,7 @@ describe("Test yaml validation of process", () => {
             { gid: 5 },
             { name: { like: "%helloworld%" } },
             {
-              virtualMemoryUsage: {
+              virtualMemory: {
                 lte: 15,
                 gte: 50
               }
@@ -306,7 +306,7 @@ describe("Test yaml validation of process", () => {
             { gid: 5 },
             { name: { like: "%helloworld%" } },
             {
-              virtualMemoryUsage: {
+              virtualMemory: {
                 lte: 15,
                 gte: 50
               }
@@ -334,13 +334,13 @@ describe("Test yaml validation of process", () => {
         - OR: 
           - name:
               like: "%helloworld%"
-          - virtualMemoryUsage:
+          - virtualMemory:
               lte: 15
               gte: 50
           - OR: 
             - name:
                 like: "%helloworld%"
-            - virtualMemoryUsage:
+            - virtualMemory:
                 lte: 15 
                 gte: 50
       - cpuUsage:
