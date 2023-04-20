@@ -1,10 +1,9 @@
 import { ID_LENGTH, MIN_INTERVAL } from "@constants";
-import { idSchema, nullable } from "@dtos/common";
+import { nullable } from "@dtos/common";
 import s from "fluent-json-schema";
 
 const kafkaJobSchema = s
     .object()
-    .prop("id", idSchema.required())
     .prop("usingTemplateId", s.string().minLength(ID_LENGTH).maxLength(ID_LENGTH).raw(nullable))
     .prop("script", s.string().required())
     .prop("brokerUrl", s.string().required())
@@ -12,7 +11,6 @@ const kafkaJobSchema = s
     .prop("interval", s.number().required().minimum(MIN_INTERVAL));
 
 type KafkaJob = {
-    id: string;
     usingTemplateId: string | null;
     brokerUrl: string;
     topicName: string;
