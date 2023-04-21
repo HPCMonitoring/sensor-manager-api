@@ -1,6 +1,6 @@
 import { USER_NOT_FOUND } from "@constants";
 import { prisma } from "@repositories";
-import { FilterTemplateDto, KafkaBrokerDto, UserDto } from "@dtos/out";
+import { FilterTemplateDto, UserDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
 
 async function getUserById(request: FastifyRequest<{ Headers: { userId: string } }>, reply: FastifyReply): Result<UserDto> {
@@ -20,24 +20,7 @@ async function getFilterTemplates(): Result<Array<FilterTemplateDto>> {
     return prisma.filterTemplate.findMany();
 }
 
-async function getKafkaBrokers(): Result<KafkaBrokerDto[]> {
-    return prisma.kafkaBroker.findMany({
-        select: {
-            id: true,
-            name: true,
-            url: true,
-            topics: {
-                select: {
-                    id: true,
-                    name: true
-                }
-            }
-        }
-    });
-}
-
 export const usersHandler = {
     getUserById,
-    getFilterTemplates,
-    getKafkaBrokers
+    getFilterTemplates
 };

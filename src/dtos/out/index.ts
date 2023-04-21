@@ -5,6 +5,5 @@
 export * from "./auth.dto";
 export * from "./cluster.dto";
 export * from "./filterTemplate.dto";
-export * from "./kafkaBroker.dto";
 export * from "./sensor.dto";
 export * from "./user.dto";

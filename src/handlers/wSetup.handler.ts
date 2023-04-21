@@ -7,9 +7,9 @@ import { prisma } from "@repositories";
 import { WQueryString } from "@dtos/in";
 import { sensorManager } from "@services";
 import { FastifyRequest } from "fastify";
-import { WsMessage, WSAuthPayload, WsSysInfoPayload } from "@interfaces";
 import yaml from "js-yaml";
 import assert from "assert";
+import { IWsMessage } from "@interfaces";
 
 const TEMP_PASSWORD = "hpc-monitoring-sensor";
 
@@ -32,7 +32,7 @@ const handleNewSensor = async (req: FastifyRequest<{ Querystring: WQueryString }
 };
 
 const doAuthSuccess = (liveSensor: LiveSensor) => {
-    const authMessage: WsMessage<WSAuthPayload> = {
+    const authMessage: IWsMessage<WSAuthPayload> = {
         cmd: WsCmd.AUTH,
         message: W_AUTHORIZED,
         error: WSSensorCode.SUCCESS,
@@ -47,7 +47,7 @@ const doAuthFail = (connection: SocketStream, message: string) => {
     // We create dumpLiveSensor here to use its sending method
     const dumpId = "UNDEFINED";
     const dumpLiveSensor = new LiveSensor(dumpId, connection);
-    const failMessage: WsMessage<WSAuthPayload> = {
+    const failMessage: IWsMessage<WSAuthPayload> = {
         cmd: WsCmd.AUTH,
         message: message,
         error: WSSensorCode.UNAUTHORIZED,
@@ -99,35 +99,23 @@ const handleAuth = async (connection: SocketStream, req: FastifyRequest<{ Querys
 };
 
 const doSendConfig = async (sensorId: string) => {
-    const sensorConfig = await prisma.sensor.findFirst({
+    const sensorConfig = await prisma.sensorKafkaJob.findMany({
         select: {
-            topicConfigs: {
-                select: {
-                    kafkaTopic: {
-                        select: {
-                            name: true,
-                            broker: {
-                                select: {
-                                    url: true
-                                }
-                            }
-                        }
-                    },
-                    script: true,
-                    interval: true
-                }
-            }
+            topicName: true,
+            brokerUrl: true,
+            script: true,
+            interval: true
         },
         where: {
             id: sensorId
         }
     });
 
-    const payloads = sensorConfig?.topicConfigs.map((c) => {
+    const payloads = sensorConfig.map((c) => {
         const filterAST = yaml.load(c.script.replaceAll("\t", "  ")) as ConfigScriptAST;
         return {
-            broker: c.kafkaTopic.broker.url,
-            topicName: c.kafkaTopic.name,
+            broker: c.brokerUrl,
+            topicName: c.topicName,
             interval: c.interval,
             type: filterAST.type,
             fields: filterAST.fields as Record<string, string>,
@@ -135,7 +123,7 @@ const doSendConfig = async (sensorId: string) => {
         };
     });
 
-    if (payloads) {
+    if (payloads.length) {
         await sensorManager.sendConfig(sensorId, payloads);
     }
 };
@@ -152,7 +140,7 @@ export const wSetupHandler = async (connection: SocketStream, req: FastifyReques
         if (liveSensor) {
             doAuthSuccess(liveSensor);
             sensorManager.onSensorConnect(liveSensor);
-            const sysInfoRequest: WsMessage<WsSysInfoPayload> = {
+            const sysInfoRequest: IWsMessage<WsSysInfoPayload> = {
                 cmd: WsCmd.SYS_INFO,
                 message: "",
                 error: WSSensorCode.SUCCESS,
@@ -163,7 +151,7 @@ export const wSetupHandler = async (connection: SocketStream, req: FastifyReques
 
                 assert(sysInfo !== "{}");
 
-                global.logger.debug(`Receive sys info: id = ${liveSensor.id}, message = ${JSON.stringify(sysInfo)}`);
+                global.logger.info(`Receive sys info: id = ${liveSensor.id}, message = ${JSON.stringify(sysInfo)}`);
 
                 await prisma.sensor.update({
                     data: {

@@ -2,7 +2,7 @@ import { HandlerTag } from "@constants";
 import { clustersHandler } from "@handlers";
 import { idSchema } from "@dtos/common";
 import { clusterMutationSchema } from "@dtos/in";
-import { clusterMutationResultSchema, clusterSummarySchema } from "@dtos/out";
+import { clusterSummarySchema } from "@dtos/out";
 import { createPlugin } from "@utils";
 import s from "fluent-json-schema";
 
@@ -25,7 +25,7 @@ export const clusterPlugin = createPlugin(
             schema: {
                 body: clusterMutationSchema,
                 response: {
-                    200: clusterMutationResultSchema
+                    200: s.string()
                 }
             },
             handler: clustersHandler.create
@@ -37,7 +37,7 @@ export const clusterPlugin = createPlugin(
                 params: s.object().prop("clusterId", idSchema.required()),
                 body: clusterMutationSchema,
                 response: {
-                    200: clusterMutationResultSchema
+                    200: s.string()
                 }
             },
             handler: clustersHandler.update
@@ -48,7 +48,7 @@ export const clusterPlugin = createPlugin(
             schema: {
                 params: s.object().prop("clusterId", idSchema.required()),
                 response: {
-                    200: clusterMutationResultSchema
+                    200: s.string()
                 }
             },
             handler: clustersHandler.delete

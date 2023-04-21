@@ -30,59 +30,40 @@ model Cluster {
 }
 
 model Sensor {
-  id            String              @id @default(cuid())
+  id            String           @id @default(cuid())
   ipAddr        String
-  name          String              @db.VarChar(50)
-  kernelName    String              @db.VarChar(100)
-  kernelVersion String              @db.VarChar(50)
-  arch          String              @db.VarChar(25)
-  hostname      String              @db.VarChar(100)
-  rootUser      String              @db.VarChar(50)
+  name          String           @db.VarChar(50)
+  kernelName    String           @db.VarChar(100)
+  kernelVersion String           @db.VarChar(50)
+  arch          String           @db.VarChar(25)
+  hostname      String           @db.VarChar(100)
+  rootUser      String           @db.VarChar(50)
   remarks       String?
   // status        SensorStatus   @default(REQUESTED)
-  cluster       Cluster             @relation(fields: [clusterId], references: [id], onDelete: Cascade)
+  cluster       Cluster          @relation(fields: [clusterId], references: [id], onDelete: Cascade)
   clusterId     String
-  topicConfigs  SensorTopicConfig[]
+  jobs          SensorKafkaJob[]
 
   @@unique([clusterId, name])
 }
 
-model KafkaBroker {
-  id     String       @id @default(cuid())
-  url    String       @unique
-  name   String       @unique
-  topics KafkaTopic[]
-}
-
-model KafkaTopic {
-  id            String              @id @default(cuid())
-  name          String
-  broker        KafkaBroker         @relation(fields: [brokerId], references: [id])
-  brokerId      String
-  sensorConfigs SensorTopicConfig[]
-
-  @@unique([brokerId, name])
-}
-
-model SensorTopicConfig {
+model SensorKafkaJob {
   id               String          @id @default(cuid())
-  sensor           Sensor          @relation(fields: [sensorId], references: [id], onDelete: Cascade)
-  kafkaTopic       KafkaTopic      @relation(fields: [kafkaTopicId], references: [id], onDelete: Cascade)
   interval         Float
   script           String          @default("# YAML script")
-  sensorId         String
-  kafkaTopicId     String
+  topicName        String
+  brokerUrl        String
   usingTemplate    FilterTemplate? @relation(fields: [filterTemplateId], references: [id])
   filterTemplateId String?
-
-  @@unique([sensorId, kafkaTopicId])
+  sensor           Sensor          @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  sensorId         String
 }
 
 model FilterTemplate {
-  id       String              @id @default(cuid())
+  id       String           @id @default(cuid())
   name     String
   remarks  String?
   script   String
   interval Float
-  configs  SensorTopicConfig[]
+  configs  SensorKafkaJob[]
 }

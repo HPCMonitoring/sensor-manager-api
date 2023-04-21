@@ -28,14 +28,6 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
-      - name: Set up env file
-        run: |
-          echo > .env.production
-          echo POSTGRES_URL=${{ env.POSTGRES_URL }} > .env.production
-          echo COOKIE_SECRET=${{ secrets.COOKIE_SECRET }} >> .env.production
-          echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env.production
-          echo CORS_WHITE_LIST=${{ vars.CORS_WHITE_LIST }} >> .env.production
-
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v2
         with:
@@ -72,14 +64,22 @@ jobs:
           script: |
             export CR_PAT=${{ secrets.GITHUB_TOKEN }}
             echo $CR_PAT | docker login ${{ env.REGISTRY }} -u ${{ env.ORG_USERNAME }} --password-stdin
-            cd $HOME/HPCMonitoring/sensor-manager-api
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            
+            cd $HOME/thesis-222
             rm -f .env
             echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
+            echo POSTGRES_URL=${{ env.POSTGRES_URL }} >> .env
+            echo COOKIE_SECRET=${{ secrets.COOKIE_SECRET }} >> .env
+            echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
+            echo CORS_WHITE_LIST=${{ vars.CORS_WHITE_LIST }} >> .env
             
-            curl https://raw.githubusercontent.com/HPCMonitoring/sensor-manager-api/master/docker-compose.yml -o docker-compose.yml
-            docker-compose pull sensor-manager-api
-            docker-compose down --remove-orphans && docker-compose up -d
+            # curl https://raw.githubusercontent.com/HPCMonitoring/sensor-manager-api/master/docker-compose.yml -o docker-compose.yml
+            docker-compose stop sensor-manager-api
+            docker-compose rm -f sensor-manager-api
+            docker-compose up -d sensor-manager-api
+            
             docker logout ${{ env.REGISTRY }}
             

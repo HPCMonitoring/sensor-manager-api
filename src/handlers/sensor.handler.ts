@@ -1,16 +1,17 @@
-import { INVALID_SCRIPT, SENSOR_NOT_EXISTS, TOPIC_NOT_FOUND } from "@constants";
+import { INVALID_SCRIPT, SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
-import { scriptSchema, UpdateSensorDto } from "@dtos/in";
+import { UpdateSensorDto, validateConfigScript } from "@dtos/in";
 import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
-import Ajv from "ajv";
+
+import { filterGenerator, sensorManager } from "@services";
 import yaml from "js-yaml";
-import { scriptParser, sensorManager } from "@services";
-import { WsTopicPayload } from "@interfaces";
 
-const ajv = new Ajv({ allErrors: false, strict: false });
-
-async function getByClusterId(request: FastifyRequest<{ Querystring: { clusterId: string } }>): Result<SensorSummaryDto[]> {
+async function getByClusterId(
+    request: FastifyRequest<{
+        Querystring: { clusterId: string };
+    }>
+): Result<SensorSummaryDto[]> {
     const sensors = await prisma.sensor.findMany({
         select: {
             id: true,
@@ -42,16 +43,11 @@ async function getById(
             arch: true,
             hostname: true,
             rootUser: true,
-            topicConfigs: {
+            jobs: {
                 select: {
                     id: true,
-                    kafkaTopic: {
-                        select: {
-                            id: true,
-                            name: true,
-                            broker: { select: { id: true, name: true, url: true } }
-                        }
-                    },
+                    topicName: true,
+                    brokerUrl: true,
                     usingTemplate: {
                         select: { id: true, name: true }
                     },
@@ -77,14 +73,13 @@ async function getById(
         hostname: sensor.hostname,
         rootUser: sensor.rootUser,
         state: sensorManager.getStatus(sensor.id),
-        subscribeTopics: sensor.topicConfigs.map((topicConfig) => ({
-            key: topicConfig.id,
-            id: topicConfig.kafkaTopic.id,
-            name: topicConfig.kafkaTopic.name,
-            interval: topicConfig.interval,
-            script: topicConfig.script,
-            broker: topicConfig.kafkaTopic.broker,
-            usingTemplate: topicConfig.usingTemplate
+        kafkaJobs: sensor.jobs.map((job) => ({
+            id: job.id,
+            topicName: job.topicName,
+            brokerUrl: job.brokerUrl,
+            interval: job.interval,
+            script: job.script,
+            usingTemplate: job.usingTemplate
         }))
     };
 }
@@ -100,41 +95,23 @@ async function update(
     const sensorId = request.params.sensorId;
     const topicConfigs: WsTopicPayload[] = [];
 
-    for (const topic of payload.subscribeTopics) {
+    for (const kafkaJob of payload.kafkaJobs) {
         try {
-            const filterAST = yaml.load(topic.script.replaceAll("\t", "  ")) as ConfigScriptAST;
-            const scriptValidate = ajv.compile(scriptSchema.valueOf());
-            const validateResult = scriptValidate(filterAST);
-
-            const sink = await prisma.kafkaTopic.findFirst({
-                select: {
-                    name: true,
-                    broker: {
-                        select: {
-                            url: true
-                        }
-                    }
-                },
-                where: {
-                    id: topic.id
-                }
-            });
+            const filterAST = yaml.load(kafkaJob.script.replaceAll("\t", "  ")) as ConfigScriptAST;
+            const validateResult = validateConfigScript(filterAST);
 
             if (!validateResult) {
-                request.log.error(scriptValidate.errors);
+                request.log.error(validateConfigScript.errors);
                 return reply.badRequest(INVALID_SCRIPT);
-            } else if (!sink) {
-                request.log.error(`Topic ID ${topic.id} does not exists`);
-                return reply.badRequest(TOPIC_NOT_FOUND);
             }
 
             topicConfigs.push({
-                broker: sink.broker.url,
-                topicName: sink.name,
-                interval: topic.interval,
+                broker: kafkaJob.brokerUrl,
+                topicName: kafkaJob.topicName,
+                interval: kafkaJob.interval,
                 type: filterAST.type,
                 fields: filterAST.fields as Record<string, string>,
-                prefixCommand: "filters" in filterAST ? scriptParser.toPrefixCommand(filterAST.filters) : ""
+                prefixCommand: "filters" in filterAST ? filterGenerator.toPrefix(filterAST.filters) : ""
             });
         } catch (err) {
             request.log.error(err);
@@ -145,20 +122,19 @@ async function update(
     try {
         await sensorManager.sendConfig(sensorId, topicConfigs);
         await prisma.$transaction([
-            prisma.sensorTopicConfig.deleteMany({
-                where: { sensorId }
-            }),
+            prisma.sensorKafkaJob.deleteMany({ where: { sensorId } }),
             prisma.sensor.update({
                 data: {
                     name: payload.name,
                     remarks: payload.remarks,
-                    topicConfigs: {
+                    jobs: {
                         createMany: {
-                            data: payload.subscribeTopics.map((item) => ({
+                            data: payload.kafkaJobs.map((item) => ({
+                                topicName: item.topicName,
+                                brokerUrl: item.brokerUrl,
                                 interval: item.interval,
                                 script: item.script,
-                                filterTemplateId: item.usingTemplateId,
-                                kafkaTopicId: item.id
+                                filterTemplateId: item.usingTemplateId
                             }))
                         }
                     }

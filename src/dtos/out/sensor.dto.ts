@@ -19,31 +19,25 @@ export type SensorSummaryDto = {
     state: SensorConnectionStatus;
 };
 
-const subscribeTopicSchema = s
+const kafkaJobSchema = s
     .object()
     .prop("id", idSchema)
-    .prop("key", idSchema.description("ID of configuration"))
-    .prop("name", s.string())
+    .prop("brokerUrl", s.string())
+    .prop("topicName", s.string())
     .prop("interval", s.number())
-    .prop("usingTemplate", s.object().raw(nullable).prop("id", idSchema).prop("name", s.string()))
     .prop("script", s.string())
-    .prop("broker", s.object().prop("id", idSchema).prop("name", s.string()).prop("url", s.string()));
+    .prop("usingTemplate", s.object().raw(nullable).prop("id", idSchema).prop("name", s.string()));
 
-type SubscribeTopicDto = {
-    key: string;
+type KafkaJobDto = {
     id: string;
-    name: string;
+    brokerUrl: string;
+    topicName: string;
     interval: number;
+    script: string;
     usingTemplate: {
         id: string;
         name: string;
     } | null;
-    script: string;
-    broker: {
-        id: string;
-        name: string;
-        url: string;
-    };
 };
 
 export const sensorDetailSchema = s
@@ -58,7 +52,7 @@ export const sensorDetailSchema = s
     .prop("hostname", s.string())
     .prop("rootUser", s.string())
     .prop("state", s.enum(allSensorStates))
-    .prop("subscribeTopics", s.array().items(subscribeTopicSchema));
+    .prop("kafkaJobs", s.array().items(kafkaJobSchema));
 
 export type SensorDetailDto = {
     id: string;
@@ -71,5 +65,5 @@ export type SensorDetailDto = {
     hostname: string;
     rootUser: string;
     state: SensorConnectionStatus;
-    subscribeTopics: SubscribeTopicDto[];
+    kafkaJobs: KafkaJobDto[];
 };
