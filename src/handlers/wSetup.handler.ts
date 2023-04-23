@@ -1,7 +1,7 @@
 import { WSCloseCode, WsCmd, WSSensorCode, WS_COMMON_TIMEOUT } from "@constants";
 import { W_UNAUTHORIZED, W_CLUSTER_NOT_EXIST, W_ID_NOT_EXIST, W_INTERVAL_SERVER, W_AUTHORIZED } from "@constants/wErrorMessages";
 import { SocketStream } from "@fastify/websocket";
-import { LiveSensor, scriptParser } from "@services";
+import { LiveSensor, filterGenerator } from "@services";
 import { Sensor } from "@prisma/client";
 import { prisma } from "@repositories";
 import { WQueryString } from "@dtos/in";
@@ -119,7 +119,7 @@ const doSendConfig = async (sensorId: string) => {
             interval: c.interval,
             type: filterAST.type,
             fields: filterAST.fields as Record<string, string>,
-            prefixCommand: "filters" in filterAST ? scriptParser.toPrefixCommand(filterAST.filters) : ""
+            prefixCommand: "filters" in filterAST ? filterGenerator.toPrefix(filterAST.filters) : ""
         };
     });
 
