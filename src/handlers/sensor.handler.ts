@@ -1,4 +1,4 @@
-import { INVALID_SCRIPT, SENSOR_NOT_EXISTS } from "@constants";
+import { INVALID_SCRIPT, SENSOR_CONFIG_FAIL, SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
 import { UpdateSensorDto, validateConfigScript } from "@dtos/in";
 import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
@@ -120,7 +120,12 @@ async function update(
     }
 
     try {
-        await sensorManager.sendConfig(sensorId, topicConfigs);
+        const configRes = await sensorManager.sendConfig(sensorId, topicConfigs);
+        if (configRes.error) {
+            request.log.error(`Sensor reply with error ${JSON.stringify(configRes)}`);
+            reply.internalServerError(SENSOR_CONFIG_FAIL);
+            return;
+        }
         await prisma.$transaction([
             prisma.sensorKafkaJob.deleteMany({ where: { sensorId } }),
             prisma.sensor.update({
