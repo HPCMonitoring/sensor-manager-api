@@ -107,7 +107,7 @@ const doSendConfig = async (sensorId: string) => {
             interval: true
         },
         where: {
-            id: sensorId
+            sensorId: sensorId
         }
     });
 
