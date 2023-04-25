@@ -56,3 +56,5 @@ test/**/*.js.map
 .env*
 !.env.example
 
+# certs
+*.crt
