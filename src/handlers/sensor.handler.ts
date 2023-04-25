@@ -4,7 +4,7 @@ import { UpdateSensorDto, validateConfigScript } from "@dtos/in";
 import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { sensorManager } from "@services";
-import yaml from "js-yaml";
+import { buildAST } from "@utils";
 
 async function getByClusterId(
     request: FastifyRequest<{
@@ -96,7 +96,7 @@ async function update(
 
     for (const kafkaJob of payload.kafkaJobs) {
         try {
-            const filterAST = yaml.load(kafkaJob.script.replaceAll("\t", "  ")) as ConfigScriptAST;
+            const filterAST = buildAST(kafkaJob.script);
             const validateResult = validateConfigScript(filterAST);
 
             if (!validateResult) {

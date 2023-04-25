@@ -23,8 +23,16 @@ export function createPlugin(swaggerTags: HandlerTag[], routesOptions: RouteOpti
     };
 }
 
-export function buildAST(yamlScript: string) {
-    return yaml.load(yamlScript.replaceAll("\t", "  "));
+export function buildAST(yamlScript: string): ConfigScriptAST {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ast: any = yaml.load(yamlScript.replaceAll("\t", "  "));
+    const fields = Object.keys(ast.fields);
+    fields.forEach((field) => {
+        if (ast.fields[field] === null) {
+            ast.fields[field] = "";
+        }
+    });
+    return ast;
 }
 
 export function staticCheckConfig(scriptAST: unknown, schema: BaseSchema<unknown>) {
