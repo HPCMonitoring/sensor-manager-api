@@ -89,7 +89,7 @@ describe("Test yaml validation of process", () => {
     const expectedAst = {
       type: "process",
       fields: {
-        pid: null,
+        pid: "",
       },
       filters: [{
         pid: 1
@@ -112,7 +112,7 @@ describe("Test yaml validation of process", () => {
     const expectedAst = {
       type: "process",
       fields: {
-        pid: null
+        pid: ""
       },
       filters: [{
         name: { like: "%helloworld%" }
@@ -278,7 +278,7 @@ describe("Test yaml validation of process", () => {
     const expectedAst = {
       type: "process",
       fields: {
-        pid: null
+        pid: ""
       },
       filters: [
         { gid: 5 },
