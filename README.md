@@ -43,7 +43,7 @@ Visit our [documentation](https://hpcmonitoring.github.io/docs) for more details
 
 ## Project configurations
 
-## VM max map count
+### VM max map count
 
 ```bash
 sudo sysctl -w vm.max_map_count=262144
