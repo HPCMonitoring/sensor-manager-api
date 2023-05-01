@@ -27,7 +27,7 @@ services:
       KAFKA_CLUSTERS_0_NAME: Self-hosted broker
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
     restart: always
-  
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
@@ -55,10 +55,10 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR:
     restart: always
 
-  elastic:
+  es_setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     container_name: es_setup
     volumes:
@@ -103,14 +103,14 @@ services:
         echo "All done!";
       '
     healthcheck:
-      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      test: [ "CMD-SHELL", "[ -f config/certs/es01/es01.crt ]" ]
       interval: 1s
       timeout: 5s
       retries: 120
-      
+
   es01:
     depends_on:
-      setup:
+      es_setup:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     container_name: es01
@@ -136,7 +136,7 @@ services:
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
-    mem_limit: ${MEM_LIMIT}
+    mem_limit: ${ELASTIC_MEM_LIMIT}
     ulimits:
       memlock:
         soft: -1
@@ -145,7 +145,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"
         ]
       interval: 10s
       timeout: 10s
@@ -168,18 +168,18 @@ services:
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
-    mem_limit: ${MEM_LIMIT}
+    # mem_limit: ${KIBANA_MEM_LIMIT}
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'",
+          "curl -s -I http://localhost:5601 | grep -q 'HTTP/1.1 302 Found'"
         ]
       interval: 10s
       timeout: 10s
       retries: 120
     restart: always
-      
+
 volumes:
   sensor_manager_db:
   certs:

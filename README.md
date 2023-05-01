@@ -43,6 +43,12 @@ Visit our [documentation](https://hpcmonitoring.github.io/docs) for more details
 
 ## Project configurations
 
+## VM max map count
+
+```bash
+sudo sysctl -w vm.max_map_count=262144
+```
+
 ### Code linting & formating
 
 We use [`eslint`](https://eslint.org/) to find and fix problem in code, such as:

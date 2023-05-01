@@ -64,6 +64,7 @@ class KafkaScriber {
             eachMessage: async ({ message }) => {
                 if (!message.value) return;
                 this.sensorStats.push(JSON.parse(message.value.toString()));
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 if (this.sensorStats.length >= this.config!.batchSize) {
                     const statsToSent = this.sensorStats.splice(0, this.sensorStats.length);
                     this.doSaveStat(statsToSent);
@@ -78,6 +79,7 @@ class KafkaScriber {
                 const messageToSent = this.sensorStats.splice(0, this.sensorStats.length);
                 this.doSaveStat(messageToSent);
             }
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         }, this.config!.lingerMs);
     }
 

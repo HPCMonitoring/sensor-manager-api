@@ -16,6 +16,7 @@
     "db:deploy": "npx prisma migrate deploy",
     "db:generate": "npx prisma generate",
     "db:studio": "npx prisma studio",
+    "cp:cert": "docker cp es01:/usr/share/elasticsearch/config/certs/ca/ca.crt ca.crt",
     "lint": "eslint '**/*.{ts,js}'",
     "lint:fix": "eslint '**/*.{ts,js}' --fix",
     "format": "prettier '**/*.{ts,js,json}' --write",
