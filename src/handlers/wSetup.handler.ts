@@ -1,12 +1,14 @@
-import { WSCloseCode, WsCmd, WSSensorCode } from "@constants";
+import { WSCloseCode, WsCmd, WSSensorCode, WS_COMMON_TIMEOUT } from "@constants";
 import { W_UNAUTHORIZED, W_CLUSTER_NOT_EXIST, W_ID_NOT_EXIST, W_INTERVAL_SERVER, W_AUTHORIZED } from "@constants/wErrorMessages";
 import { SocketStream } from "@fastify/websocket";
-import { LiveSensor } from "@services";
+import { LiveSensor, filterGenerator } from "@services";
 import { Sensor } from "@prisma/client";
 import { prisma } from "@repositories";
 import { WQueryString } from "@dtos/in";
 import { sensorManager } from "@services";
 import { FastifyRequest } from "fastify";
+import yaml from "js-yaml";
+import assert from "assert";
 import { IWsMessage } from "@interfaces";
 
 const TEMP_PASSWORD = "hpc-monitoring-sensor";
@@ -96,6 +98,36 @@ const handleAuth = async (connection: SocketStream, req: FastifyRequest<{ Querys
     }
 };
 
+const doSendConfig = async (sensorId: string) => {
+    const sensorConfig = await prisma.sensorKafkaJob.findMany({
+        select: {
+            topicName: true,
+            brokerUrl: true,
+            script: true,
+            interval: true
+        },
+        where: {
+            sensorId: sensorId
+        }
+    });
+
+    const payloads = sensorConfig.map((c) => {
+        const filterAST = yaml.load(c.script.replaceAll("\t", "  ")) as ConfigScriptAST;
+        return {
+            broker: c.brokerUrl,
+            topicName: c.topicName,
+            interval: c.interval,
+            type: filterAST.type,
+            fields: filterAST.fields as Record<string, string>,
+            prefixCommand: "filters" in filterAST ? filterGenerator.toPrefix(filterAST.filters) : ""
+        };
+    });
+
+    if (payloads.length) {
+        await sensorManager.sendConfig(sensorId, payloads);
+    }
+};
+
 export const wSetupHandler = async (connection: SocketStream, req: FastifyRequest<{ Querystring: WQueryString }>) => {
     global.logger.info(`Sensor connected: ip = ${req.ip}, query = ${JSON.stringify(req.query)}`);
     if (!req.headers.authorization || req.headers.authorization !== TEMP_PASSWORD) {
@@ -115,8 +147,12 @@ export const wSetupHandler = async (connection: SocketStream, req: FastifyReques
                 payload: "{}"
             };
             try {
-                const sysInfo = await liveSensor.sendReqRes(sysInfoRequest, 1000);
-                global.logger.debug(`Receive sys info: id = ${liveSensor.id}, message = ${JSON.stringify(sysInfo)}`);
+                const sysInfo = (await liveSensor.sendReqRes(sysInfoRequest, WS_COMMON_TIMEOUT)).payload;
+
+                assert(sysInfo !== "{}");
+
+                global.logger.info(`Receive sys info: id = ${liveSensor.id}, message = ${JSON.stringify(sysInfo)}`);
+
                 await prisma.sensor.update({
                     data: {
                         kernelName: sysInfo.kernelName,
@@ -129,6 +165,8 @@ export const wSetupHandler = async (connection: SocketStream, req: FastifyReques
                         id: liveSensor.id
                     }
                 });
+
+                await doSendConfig(liveSensor.id);
             } catch (err) {
                 global.logger.error(`Error in sys info request with error = ${err}`);
             }

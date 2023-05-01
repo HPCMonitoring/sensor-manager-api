@@ -1,9 +1,10 @@
-import { INVALID_SCRIPT, SENSOR_NOT_EXISTS } from "@constants";
+import { INVALID_SCRIPT, SENSOR_CONFIG_FAIL, SENSOR_NOT_EXISTS } from "@constants";
 import { prisma } from "@repositories";
 import { UpdateSensorDto, validateConfigScript } from "@dtos/in";
 import { SensorDetailDto, SensorSummaryDto } from "@dtos/out";
 import { FastifyReply, FastifyRequest } from "fastify";
-import { sensorManager } from "@services";
+
+import { filterGenerator, sensorManager } from "@services";
 import { buildAST } from "@utils";
 
 async function getByClusterId(
@@ -92,7 +93,7 @@ async function update(
 ): Result<string> {
     const payload = request.body;
     const sensorId = request.params.sensorId;
-    const sensorConfigIns: SensorConfig[] = [];
+    const topicConfigs: WsTopicPayload[] = [];
 
     for (const kafkaJob of payload.kafkaJobs) {
         try {
@@ -103,11 +104,14 @@ async function update(
                 request.log.error(validateConfigScript.errors);
                 return reply.badRequest(INVALID_SCRIPT);
             }
-            sensorConfigIns.push({
+
+            topicConfigs.push({
                 broker: kafkaJob.brokerUrl,
                 topicName: kafkaJob.topicName,
                 interval: kafkaJob.interval,
-                script: filterAST
+                type: filterAST.type,
+                fields: filterAST.fields as Record<string, string>,
+                prefixCommand: "filters" in filterAST ? filterGenerator.toPrefix(filterAST.filters) : ""
             });
         } catch (err) {
             request.log.error(err);
@@ -116,7 +120,12 @@ async function update(
     }
 
     try {
-        await sensorManager.sendConfig(sensorId, sensorConfigIns);
+        const configRes = await sensorManager.sendConfig(sensorId, topicConfigs);
+        if (configRes.error) {
+            request.log.error(`Sensor reply with error ${JSON.stringify(configRes)}`);
+            reply.internalServerError(SENSOR_CONFIG_FAIL);
+            return;
+        }
         await prisma.$transaction([
             prisma.sensorKafkaJob.deleteMany({ where: { sensorId } }),
             prisma.sensor.update({

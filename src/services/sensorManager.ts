@@ -3,7 +3,6 @@ import { SocketStream } from "@fastify/websocket";
 import { IWsMessage, IWsMessageWrap } from "@interfaces";
 import { assert } from "console";
 import WebSocket from "ws";
-import { filterGenerator } from "./sensorConfigParser";
 
 type PExecutor<T = unknown> = {
     resolve: (value: T | PromiseLike<T>) => void;
@@ -30,7 +29,6 @@ export class LiveSensor {
 
     private setup() {
         this.connection.socket.on("ping", () => {
-            global.logger.info(`On ping sensor with id: ${this.id}`);
             this.lastPingTime = new Date();
         });
         this.connection.socket.on("message", (data) => {
@@ -65,29 +63,28 @@ export class LiveSensor {
 
         // TODO: need better approach to generate coordId in case of high load
         const coordId = `${message.cmd}_${this.sequenceNum++ % Math.pow(2, SEQUENCE_BITS)}`;
-        const resPromise = new Promise<T>((resolve, reject) => {
+        const resPromise = new Promise<IWsMessage<T>>((resolve, reject) => {
             this.reqResCb.set(coordId, { resolve: resolve, reject: reject });
+            const sentData: IWsMessageWrap<T> = {
+                ...message,
+                coordId: coordId
+            };
+
+            this.connection.socket.send(JSON.stringify(sentData), (err) => {
+                if (err) {
+                    this.reqResCb.get(coordId)?.reject(`Command: ${message.cmd} with coorId: ${coordId} send error`);
+                }
+            });
         });
 
-        const sentData: IWsMessageWrap<T> = {
-            ...message,
-            coordId: coordId
-        };
-
-        this.connection.socket.send(JSON.stringify(sentData), (err) => {
-            if (err) {
-                this.reqResCb.get(coordId)?.reject(`Command: ${message.cmd} with coorId: ${coordId} send error`);
-            }
-        });
-
-        const timeoutPromise = new Promise<T>((_resolve, reject) => {
+        const timeoutPromise = new Promise<IWsMessage<T>>((_resolve, reject) => {
             setTimeout(() => {
                 reject(`Command: ${message.cmd} with coorId: ${coordId} receive response timeout`);
                 this.reqResCb.delete(coordId);
             }, timeout);
         });
 
-        return Promise.race<T>([resPromise, timeoutPromise]);
+        return Promise.race<IWsMessage<T>>([resPromise, timeoutPromise]);
     }
 
     close(code: WSCloseCode, message: string) {
@@ -113,22 +110,13 @@ export class SensorManagerServer {
         return state === WebSocket.OPEN ? "RUNNING" : "DISCONNECTED";
     }
 
-    sendConfig(sensorId: string, configs: SensorConfig[]) {
-        const topicPayloads: WsTopicPayload[] = configs.map((c) => ({
-            interval: c.interval,
-            broker: c.broker,
-            topicName: c.topicName,
-            type: c.script.type,
-            fields: c.script.fields as Record<string, string>,
-            prefixCommand: "filters" in c.script ? filterGenerator.toPrefix(c.script.filters) : ""
-        }));
-
+    sendConfig(sensorId: string, topics: WsTopicPayload[]) {
         const message: IWsMessage<WsConfigPayload> = {
             cmd: WsCmd.CONFIG,
             message: "",
             error: WSSensorCode.SUCCESS,
             payload: {
-                topics: topicPayloads
+                topics: topics
             }
         };
 
