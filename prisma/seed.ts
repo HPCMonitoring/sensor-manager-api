@@ -16,8 +16,7 @@ fields:
   name: processName
   virtualMemory: RAM
 filters:
-  AND:
-    - pid: 1
+  - pid: 1
 `;
 
 async function generateSampleData() {

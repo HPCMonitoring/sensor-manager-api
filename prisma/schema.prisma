@@ -15,11 +15,6 @@ model User {
   id       String @id @default(cuid())
   email    String @unique @db.VarChar(50)
   password String
-
-  // Currently, not bind resource to a specific user
-  // clusters       Cluster[]
-  // FilterTemplate FilterTemplate[]
-  // KafkaBroker    KafkaBroker[]
 }
 
 model Cluster {
@@ -39,7 +34,6 @@ model Sensor {
   hostname      String           @db.VarChar(100)
   rootUser      String           @db.VarChar(50)
   remarks       String?
-  // status        SensorStatus   @default(REQUESTED)
   cluster       Cluster          @relation(fields: [clusterId], references: [id], onDelete: Cascade)
   clusterId     String
   jobs          SensorKafkaJob[]
