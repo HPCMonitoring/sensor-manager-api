@@ -78,7 +78,6 @@ export const processScript = s
         s
             .array()
             .id("#filters")
-            .minItems(1)
             .items(
                 s.oneOf([
                     ...fieldConditions,

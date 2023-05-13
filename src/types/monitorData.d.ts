@@ -1,14 +1,6 @@
 type ProcessEqField = "pid" | "parentPid" | "uid" | "gid";
 type ProcessRegexField = "name" | "executePath" | "command";
-type ProcessNotEqField =
-    | "virtualMemory"
-    | "physicalMemory"
-    | "cpuTime"
-    | "cpuUsage"
-    | "networkInBandwidth"
-    | "networkOutBandwidth"
-    | "writeKBs"
-    | "readKBs";
+type ProcessNotEqField = "virtualMemory" | "physicalMemory" | "cpuTime" | "cpuUsage" | "networkIn" | "networkOut" | "writeKBs" | "readKBs";
 type ProcessField = ProcessEqField | ProcessRegexField | ProcessNotEqField;
 
 type NetworkInterfaceField = "name" | "receive" | "transmit";

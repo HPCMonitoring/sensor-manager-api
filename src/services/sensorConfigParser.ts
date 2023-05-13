@@ -35,7 +35,7 @@ class FilterGenerator {
     }
 
     toPrefix(conds?: Condition[]) {
-        if (!conds) return "";
+        if (!conds || conds.length === 0) return "";
         if (conds.length === 1) return this.visitCondition(conds[0]);
         return this.visitAndCondition({ AND: conds });
     }
