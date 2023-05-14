@@ -3,7 +3,6 @@ import type { FastifyCookieOptions } from "@fastify/cookie";
 import { COOKIE_SECRET, CORS_WHITE_LIST, ENVIRONMENT, loggerConfig, swaggerConfig, swaggerUIConfig } from "@configs";
 import { apiPlugin, authPlugin } from "./plugins";
 import { wQuerySchema } from "@dtos/in";
-// import { kafkaAdmin } from "@services";
 import { wSetupHandler } from "@handlers";
 
 export function createServer(config: ServerConfig) {
